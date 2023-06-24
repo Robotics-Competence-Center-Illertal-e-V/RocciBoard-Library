@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Doxygen
+Doxyfile*
+doxygen_sqlite3.db
+html
+*.tmp
