@@ -44,13 +44,29 @@
 
 #include "Arduino.h"
 
-#include "motors.h"
+#include "rbmotors.h"
+
+//! Motor Driver 1
+#define M1 0 
+//! Motor Driver 2
+#define M2 1
+//! Motor Driver 3
+#define M3 2
+//! Motor Driver 4
+#define M4 3
 
 /**
- * Hardware specific class that implements the functions of the RocciBoard-Shield
+ * Hardware specific class that implements the functions of the RocciBoard-Shield. \n
+ * WARNING: Only use it once in your program!
 */
 class RocciBoard {
   public:
+
+    /**
+     * Creates the RocciBoard-Object
+    */
+    RocciBoard (void);
+
     /** @defgroup general_functions General Functions */
 
     /**
@@ -58,7 +74,7 @@ class RocciBoard {
      * @ingroup general_functions
      * @return bool : Initialization successful
     */
-    bool InitRocciBoard (void);
+    bool Init (void);
 
     /** @defgroup addtitional_features Additional Features and Functions */
 
@@ -84,8 +100,11 @@ class RocciBoard {
     // Signal an internal error using the built-in Error-LED
     void BlinkErrorLED (void);   
 
-}
+};
 
+#endif
+
+/*
 #if defined(ARDUINO_ARCH_AVR)
   // AVR-specific code
 #elif defined(ARDUINO_ARCH_SAM)
@@ -93,5 +112,4 @@ class RocciBoard {
 #else
   #error "This library only supports boards with an AVR or SAM processor."
 #endif
-
-#endif
+*/

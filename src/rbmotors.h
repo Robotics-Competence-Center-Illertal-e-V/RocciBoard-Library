@@ -1,5 +1,5 @@
 /** 
- * @file motors.h
+ * @file rbmotors.h
  * 
  * DRV8871 motor driver library for the RocciBoard
  * 
@@ -13,10 +13,20 @@
 #include "Arduino.h"
 
 /**
- * Helper class for implementing motors for easy usage. Instances are created automatically when initializing the RocciBoard!
+ * Helper class for implementing motors for easy usage. \n
+ * WARNING: Instances are created automatically when initializing the RocciBoard!
 */
 class RBMotor {
+
   public:
+
+    /**
+     * Creates the RBMotor-Object and assigns digital pins
+     * @param pin_1 first digital pin of the DRV8871
+     * @param pin_2 second digital pin of the DRV8871
+    */
+    RBMotor (uint8_t pin_1, uint8_t pin_2);
+    RBMotor (void) {}
 
     /**
      * Initializes the motor
@@ -24,28 +34,30 @@ class RBMotor {
     void Init (void);
     
     /**
-     * Turns the motor off
+     * Turns the motor off either with or without braking (braking=true is preferred)
+     * @param brake True: stopping the motor electrically, False: letting the motor stop through friction
     */
-    void Off (void);
+    void Stop (bool brake);
+    void Stop (void);
 
     /**
-     * Controls the DRV8871 motor driver to use a DC-motor
+     * Sets the speed of the motor to a specific value
      * @param speed that the motor should be set to (-255 -> 255)
     */
-    void SetSpeed (int16_t speed);
+    void Rotate (int16_t speed);
 
     /**
      * Returns the current set-speed of the motor
-     * @ingroup motor_drivers
      * @return int16_t : set-speed of the motor (-255 -> 255)
     */
-    int16_t GetSpeed (uint8_t index);
+    int16_t GetSpeed (void);
 
   private:
 
-    uint8_t index_;
-    int16_t speed_;
+    uint8_t pin_1_ = 0;
+    uint8_t pin_2_ = 0;
+    int16_t speed_ = 0;
 
-}
+};
 
 #endif
