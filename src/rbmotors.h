@@ -10,7 +10,7 @@
 #ifndef rbmotors_h
 #define rbmotors_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 /**
  * Helper class for implementing motors for easy usage. \n
@@ -18,7 +18,7 @@
 */
 class RBMotor {
 
-  public:
+public:
 
     /**
      * Creates the RBMotor-Object and assigns digital pins
@@ -52,7 +52,7 @@ class RBMotor {
     */
     int16_t GetSpeed (void);
 
-  private:
+private:
 
     uint8_t pin_1_ = 0;
     uint8_t pin_2_ = 0;
