@@ -10,15 +10,14 @@ RBMotor::RBMotor (uint8_t pin_1, uint8_t pin_2)
     pin_2_ = pin_2;
 }
 
-void RBMotor::Init (void)
+void RBMotor::init (void)
 {
     pinMode(pin_1_, OUTPUT);
     pinMode(pin_2_, OUTPUT);
-    Stop(false);
+    stop(false);
 }
 
-void RBMotor::Stop () { Stop(true); }
-void RBMotor::Stop (bool brake)
+void RBMotor::stop (bool brake)
 {
     // 1-1: Using the slow-current-decay brake mode of the DRV8871
     // 0-0: Using the fast-current-decay coast mode of the DRV8871
@@ -27,7 +26,7 @@ void RBMotor::Stop (bool brake)
     speed_ = 0;
 }
 
-void RBMotor::Rotate (int16_t speed)
+void RBMotor::rotate (int16_t speed)
 {
     // PWM should switch between braking and powering according to the DRV8871 datasheet (-> inverse PWM value)
     analogWrite(pin_1_, speed < 0 ? 255 : 255 - speed);
@@ -35,7 +34,7 @@ void RBMotor::Rotate (int16_t speed)
     speed_ = speed;
 }
 
-int16_t RBMotor::GetSpeed (void)
+int16_t RBMotor::getSpeed (void)
 {
     return speed_;
 }

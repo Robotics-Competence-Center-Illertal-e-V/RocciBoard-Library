@@ -21,10 +21,11 @@ typedef struct {
     float x;
     float y;
     float z;
-} Vector;
+} RBVector;
 
 /**
  * Class for implementing the BNO055 compass sensor for easy usage.
+ * _NoMux: Disables the default I²C-sensor-multiplexing of the RocciBoard so that the sensor can be used on regular I²C.
 */
 class RBCompass {
 
@@ -33,73 +34,90 @@ public:
     /**
      * Initializes the BNO055 compass sensor
     */    
-    void Init (void);
+    void init (TCA9548A tca, uint8_t sensor_port);
+    void init_NoMux (void);
 
     /**
-     * Heading describes the angle of the robot in the horizontal plane 
+     * heading describes the angle of the robot in the horizontal plane 
      * @return int16_t : Heading angle (0° -> 365°)
      */
-    int16_t Heading (void);
+    int16_t getHeading (void);
+    int16_t getHeading_NoMux (void);
 
     /**
      * Pitch describes the angle of the robot pointing up or down
      * @return int16_t : Pitch angle (-180° -> 180)
      */
-    int16_t Pitch (void);
+    int16_t getPitch (void);
+    int16_t getPitch_NoMux (void);
 
     /**
      * Roll describes the angle of the robot rolling left and right
      * @return int16_t : Roll angle (-180° -> 180)
      */
-    int16_t Roll (void);
+    int16_t getRoll (void);
+    int16_t getRoll_NoMux (void);
 
     /**
      * Returns the ambient temperature of the compass sensor
      * @return int8_t : temperature in °C
      */
-    int8_t Temperature (void);
+    int8_t getTemperature (void);
+    int8_t getTemperature_NoMux (void);
 
     /**
      * Returns the orientation-vector of the robot
-     * @return Vector : x,y,z-compontens of the orientation euler-angle
+     * @return RBVector : x,y,z-compontens of the orientation euler-angle
      */
-    Vector Orientation (void);
+    RBVector getVecOrientation (void);
+    RBVector getVecOrientation_NoMux (void);
 
     /**
      * Returns the acceleration of the robot including gravity 
-     * @return Vector : x,y,z-compontens of the accelaration in m/s²
+     * @return RBVector : x,y,z-compontens of the accelaration in m/s²
      */
-    Vector Accelerometer (void);
+    RBVector getVecAccelerometer (void);
+    RBVector getVecAccelerometer_NoMux (void);
 
     /**
      * Returns the acceleration of the robot excluding gravity 
-     * @return Vector : x,y,z-compontens of the accelaration in m/s²
+     * @return RBVector : x,y,z-compontens of the accelaration in m/s²
      */
-    Vector LinearAcceleration (void);
+    RBVector getVecLinearAcceleration (void);
+    RBVector getVecLinearAcceleration_NoMux (void);
 
     /**
      * Returns the angular-velocity-vector of the Robot
-     * @return Vector : x,y,z-compontens of the angular velocity in rad/s
+     * @return RBVector : x,y,z-compontens of the angular velocity in rad/s
      */
-    Vector Gyroscope (void);
+    RBVector getVecGyroscope (void);
+    RBVector getVecGyroscope_NoMux (void);
 
     /**
      * Returns the magnetic-field-vector measured by the compass sensor
-     * @return Vector : x,y,z-compontens of the magnetic field in uT (micro-tesla)
+     * @return RBVector : x,y,z-compontens of the magnetic field in uT (micro-tesla)
      */
-    Vector MagneticField (void);
+    RBVector getVecMagneticField (void);
+    RBVector getVecMagneticField_NoMux (void);
     
     /**
      * Returns the gravitaional acceleration of the robot
-     * @return Vector : x,y,z-compontens of the accelaration in m/s²
+     * @return RBVector : x,y,z-compontens of the accelaration in m/s²
      */
-    Vector Gravity (void);
+    RBVector getVecGravity (void);
+    RBVector getVecGravity_NoMux (void);
 
 private:
 
-    void GetData (Adafruit_BNO055::adafruit_vector_type_t event_type);
+    /**
+     * Updates the values of the compass-sensor
+    */  
+    void getData (Adafruit_BNO055::adafruit_vector_type_t event_type);
+    void getData_NoMux (Adafruit_BNO055::adafruit_vector_type_t event_type);
 
     Adafruit_BNO055 bno_ = Adafruit_BNO055(55, 0x28, &Wire);
+    TCA9548A tca_; 
+    uint8_t port_;
     sensors_event_t data_;
 
 };

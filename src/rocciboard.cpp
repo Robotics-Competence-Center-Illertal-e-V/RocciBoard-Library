@@ -2,7 +2,7 @@
  * @file rocciboard.cpp
 */
 
-#include "RocciBoard.h"
+#include "rocciboard.h"
 
 RocciBoard::RocciBoard (void)
 {
@@ -12,32 +12,45 @@ RocciBoard::RocciBoard (void)
     motor[3] = RBMotor(11,12);
 }
 
-bool RocciBoard::Init (void)
+bool RocciBoard::init (void)
 {
     // Initializing Error-LED
     pinMode(13, OUTPUT);
     digitalWrite(13, LOW);
     // Initializing Motor Drivers
-    motor[0].Init();
-    motor[1].Init();
-    motor[2].Init();
-    motor[3].Init();
+    motor[0].init();
+    motor[1].init();
+    motor[2].init();
+    motor[3].init();
     // Initializing I2C-Multiplexer
     tca_.begin(Wire);
     tca_.closeAll();
 }
 
-void RocciBoard::OpenChannel (uint8_t index)
+void RocciBoard::openSensorChannel (uint8_t sensor_port)
 {
     tca_.openChannel(index);
 }
 
-void RocciBoard::CloseChannel (uint8_t index)
+void RocciBoard::closeSensorChannel (uint8_t sensor_port)
 {
     tca_.closeChannel(index);
 }
 
-void RocciBoard::CloseAllChannels (void)
+void RocciBoard::closeAllSensorChannels (void)
 {
     tca_.closeAll();
+}
+
+RBCompass RocciBoard::initCompassSensor (uint8_t sensor_port)
+{
+    compass_sensor_.init(tca_, sensor_port);
+    return compass_sensor_;
+}
+
+void RocciBoard::updateCompassSensor (void)
+{
+    openSensorChannel(compass_port_);
+    compass_sensor.init();
+    closeSensorChannel(compass_port_);
 }

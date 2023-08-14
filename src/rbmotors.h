@@ -31,26 +31,26 @@ public:
     /**
      * Initializes the motor
     */
-    void Init (void);
+    void init (void);
     
     /**
-     * Turns the motor off either with or without braking (braking=true is preferred)
+     * Turns the motor off either with or without braking (braking=true is default)
      * @param brake True: stopping the motor electrically, False: letting the motor stop through friction
     */
-    void Stop (bool brake);
-    void Stop (void);
+    void stop (bool brake);
+    void stop (void) { stop(true); };
 
     /**
      * Sets the speed of the motor to a specific value
      * @param speed that the motor should be set to (-255 -> 255)
     */
-    void Rotate (int16_t speed);
+    void rotate (int16_t speed);
 
     /**
      * Returns the current set-speed of the motor
      * @return int16_t : set-speed of the motor (-255 -> 255)
     */
-    int16_t GetSpeed (void);
+    int16_t getSpeed (void);
 
 private:
 

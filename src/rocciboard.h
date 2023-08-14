@@ -45,15 +45,7 @@
 #include "Arduino.h"
 
 #include "rbmotors.h"
-
-//! Motor Driver 1
-#define M1 0 
-//! Motor Driver 2
-#define M2 1
-//! Motor Driver 3
-#define M3 2
-//! Motor Driver 4
-#define M4 3
+#include "rbcompass.h"
 
 /**
  * Hardware specific class that implements the functions of the RocciBoard-Shield. \n
@@ -74,31 +66,67 @@ class RocciBoard {
      * @ingroup general_functions
      * @return bool : Initialization successful
     */
-    bool Init (void);
+    bool init (void);
+
+    /** @defgroup sensor_functions Sensors and their functions */
+
+    /**
+     * Opens a sensor-channel on the I²C-Multiplexer. \n 
+     * (WARNING: Be sure to always close the channel after use!)
+     * @param sensor_port port/channel of the sensor
+     * @ingroup sensor_functions
+    */
+    void openSensorChannel (uint8_t sensor_port);
+    
+    /**
+     * Closes a sensor-channel on the I²C-Multiplexer.
+     * @param sensor_port port/channel of the sensor
+     * @ingroup sensor_functions
+    */
+    void closeSensorChannel (uint8_t sensor_port);
+
+    /**
+     * Closes all sensor-channels on the I²C-Multiplexer.
+     * @ingroup sensor_functions
+    */
+    void closeAllSensorChannels (void);
+
+    /**
+     * Initializes a BNO055 compass-sensor on a given sensor port.
+     * @param sensor_port port/channel of the sensor
+     * @return RBCompass : compass-object of the connected compass-sensor
+     * @ingroup sensor_functions
+    */
+    RBCompass initCompassSensor (uint8_t sensor_port);
 
     /** @defgroup addtitional_features Additional Features and Functions */
 
     /**
      * Returns the current voltage of the robots battery
-     * @ingroup addtitional_features
      * @return float : battery voltage of the robot
+     * @ingroup addtitional_features
     */
-    float GetBatteryVoltage (void);
+    float getBatteryVoltage (void);
 
     /**
      * Returns the current state-of-charge of the robots battery \n
-     * (WARNING: Does only work with LiPo 3S batteries! Treat values with caution! Use GetBatteryVoltage() for accurate measurement!)
-     * @ingroup addtitional_features
+     * (WARNING: Does only work with LiPo 3S batteries! Treat values with caution! Use getBatteryVoltage() for accurate measurement!)
      * @return int16_t : set-speed of the motor (-255 -> 255)
+     * @ingroup addtitional_features
     */
-    uint8_t GetBatteryCharge (void);
+    uint8_t getBatteryCharge (void);
 
     RBMotor motor[4];
 
   private:
 
-    // Signal an internal error using the built-in Error-LED
-    void BlinkErrorLED (void);   
+    /**
+     * Signal an internal error using the built-in Error-LED
+    */ 
+    void blinkErrorLED (void); 
+
+    TCA9548A tca_;   
+    RBCompass compass_sensor_;
 
 };
 
