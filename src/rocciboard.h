@@ -3,7 +3,7 @@
  *
  * @mainpage    RocciBoard Library
  * This library was developed by the AK-Entwicklung of the RoCCI e. V. junior robotics association in 2023 together with its hardware complement, 
- * the RocciBoard-Shield for Arduino Mega/Giga, to provide students an easy to learn platform and a first entry into the world of microcontrollers and C++ programming.
+ * the RocciBoard-Shield for the Arduino Mega/Giga, to provide students an easy-to-learn platform and a first entry into the world of microcontrollers and C++ programming.
  * Because it is meant for young students, this library may not provide all functions and possibilies of the underlying hardware, 
  * but rather the fundamentals needed when starting off with robotics.
  *
@@ -43,17 +43,24 @@
 #define rocciboard_h
 
 #include "Arduino.h"
+#include "TCA9548A.h"
 
-#include "rbmotors.h"
+#include "rbsensor.h"
+#include "rbmotor.h"
 #include "rbcompass.h"
+#include "rblaser.h"
+
+#define RB_DEBUG_LED 13
+#define RB_BATTERY_ADC A0
+#define RB_MUX_RESET 4
 
 /**
  * Hardware specific class that implements the functions of the RocciBoard-Shield. \n
  * WARNING: Only use it once in your program!
 */
 class RocciBoard {
-  public:
 
+  public:
     /**
      * Creates the RocciBoard-Object
     */
@@ -66,7 +73,7 @@ class RocciBoard {
      * @ingroup general_functions
      * @return bool : Initialization successful
     */
-    bool init (void);
+    void init (void);
 
     /** @defgroup sensor_functions Sensors and their functions */
 
@@ -92,12 +99,18 @@ class RocciBoard {
     void closeAllSensorChannels (void);
 
     /**
-     * Initializes a BNO055 compass-sensor on a given sensor port.
-     * @param sensor_port port/channel of the sensor
-     * @return RBCompass : compass-object of the connected compass-sensor
+     * Resets the I²C-multiplexer by using its reset-pin.
      * @ingroup sensor_functions
     */
-    RBCompass initCompassSensor (uint8_t sensor_port);
+    void resetMultiplexer (void);
+
+    /**
+     * Initializes a RocciBoard-Sensor on a given sensor port.
+     * @param sensor pointer to the object of the sensor (e.g. &compass)
+     * @param sensor_port I2C-port of the sensor to initialize
+     * @ingroup sensor_functions
+    */
+    void initSensor (RBSensor *sensor, uint8_t sensor_port);
 
     /** @defgroup addtitional_features Additional Features and Functions */
 
@@ -111,22 +124,21 @@ class RocciBoard {
     /**
      * Returns the current state-of-charge of the robots battery \n
      * (WARNING: Does only work with LiPo 3S batteries! Treat values with caution! Use getBatteryVoltage() for accurate measurement!)
-     * @return int16_t : set-speed of the motor (-255 -> 255)
+     * @return int8_t : state-of-charge of the battery in percent (0-100)
      * @ingroup addtitional_features
     */
     uint8_t getBatteryCharge (void);
 
+    /**
+     * Signal something using the built-in Debug-LED.
+     * Activates the Debug-LED for 100 milliseconds.
+    */ 
+    void blinkDebugLED (void); 
+
     RBMotor motor[4];
 
   private:
-
-    /**
-     * Signal an internal error using the built-in Error-LED
-    */ 
-    void blinkErrorLED (void); 
-
     TCA9548A tca_;   
-    RBCompass compass_sensor_;
 
 };
 

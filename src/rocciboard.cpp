@@ -12,29 +12,34 @@ RocciBoard::RocciBoard (void)
     motor[3] = RBMotor(11,12);
 }
 
-bool RocciBoard::init (void)
+void RocciBoard::init (void)
 {
     // Initializing Error-LED
-    pinMode(13, OUTPUT);
-    digitalWrite(13, LOW);
+    pinMode(RB_DEBUG_LED, OUTPUT);
+    digitalWrite(RB_DEBUG_LED, LOW);
+    // Initializing the voltage-reading ADC
+    pinMode(RB_BATTERY_ADC, INPUT);
     // Initializing Motor Drivers
     motor[0].init();
     motor[1].init();
     motor[2].init();
     motor[3].init();
     // Initializing I2C-Multiplexer
+    pinMode(RB_MUX_RESET, INPUT_PULLUP);
     tca_.begin(Wire);
     tca_.closeAll();
+    // Blink debug-LED to signal finished bootup
+    blinkDebugLED();
 }
 
 void RocciBoard::openSensorChannel (uint8_t sensor_port)
 {
-    tca_.openChannel(index);
+    tca_.openChannel(sensor_port);
 }
 
 void RocciBoard::closeSensorChannel (uint8_t sensor_port)
 {
-    tca_.closeChannel(index);
+    tca_.closeChannel(sensor_port);
 }
 
 void RocciBoard::closeAllSensorChannels (void)
@@ -42,15 +47,41 @@ void RocciBoard::closeAllSensorChannels (void)
     tca_.closeAll();
 }
 
-RBCompass RocciBoard::initCompassSensor (uint8_t sensor_port)
+void RocciBoard::resetMultiplexer (void)
 {
-    compass_sensor_.init(tca_, sensor_port);
-    return compass_sensor_;
+    pinMode(RB_MUX_RESET, OUTPUT);
+    digitalWrite(RB_MUX_RESET, LOW);
+    delay(500);
+    pinMode(RB_MUX_RESET, INPUT_PULLUP);
 }
 
-void RocciBoard::updateCompassSensor (void)
+void RocciBoard::initSensor (RBSensor *sensor, uint8_t sensor_port)
 {
-    openSensorChannel(compass_port_);
-    compass_sensor.init();
-    closeSensorChannel(compass_port_);
+    sensor->setMultiplexer(&tca_);
+    sensor->setSensorPort(sensor_port);
+    sensor->init();
+}
+
+#if defined(ARDUINO_ARCH_AVR)
+    float RocciBoard::getBatteryVoltage (void)
+    {
+        return 0.000000f + 1.000000f * (float)analogRead(RB_BATTERY_ADC);
+    }
+#elif defined(ARDUINO_ARCH_SAM)
+    float RocciBoard::getBatteryVoltage (void)
+    {
+        return 0.000000f + 1.000000f * (float)analogRead(RB_BATTERY_ADC);
+    }
+#endif
+
+uint8_t RocciBoard::getBatteryCharge (void)
+{
+    return (uint8_t)(1.000000f * getBatteryVoltage());
+}
+
+void RocciBoard::blinkDebugLED (void)
+{
+    digitalWrite(RB_DEBUG_LED, HIGH);
+    delay(100);
+    digitalWrite(RB_DEBUG_LED, LOW);
 }

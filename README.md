@@ -4,5 +4,3 @@ Dieses Repository beinhaltet Projekte, Bibliotheken und Dateien, die für die En
 Funktionen und Komponenten der Bibliothek können **Fehler und Bugs enthalten**, **unvollständig**, **ungetestet** oder **nur für den experimentellen Gebrauch** bestimmt sein.
 Funktion und Vollständigkeit dieses Repositorys können nicht garantiert werden, **bitte den Inhalt daher mit Vorsicht genießen**!
 
-*Die entgültige Version der RocciBoard-Library wird in einem seperaten Repository veröffentlicht!*
-

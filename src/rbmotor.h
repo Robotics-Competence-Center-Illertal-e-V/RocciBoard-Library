@@ -1,5 +1,5 @@
 /** 
- * @file rbmotors.h
+ * @file rbmotor.h
  * 
  * DRV8871 motor driver library for the RocciBoard
  * 
@@ -7,10 +7,10 @@
  * @version 1.0 [09-2023] First stable release
 */
 
-#ifndef rbmotors_h
-#define rbmotors_h
+#ifndef rbmotor_h
+#define rbmotor_h
 
-#include <Arduino.h>
+#include "Arduino.h"
 
 /**
  * Helper class for implementing motors for easy usage. \n

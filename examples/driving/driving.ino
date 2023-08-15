@@ -1,11 +1,11 @@
-#include "rocciboard.h"
+#include "rocciboard.h"     // Include the RocciBoard Library
 
 RocciBoard rb;
 
 void setup() {
 
-    // Initialize RocciBoard and Motor Drivers
-    rb.init();
+    Serial.begin(9600);     // Establish Serial Connection with the PC
+    rb.init();              // Initialize RocciBoard and Sensors
     
 }
 
@@ -28,6 +28,7 @@ void loop() {
 
 }
 
+// Custom function to stop all motors
 void stopAllMotors (bool brake) 
 {
     rb.motor[0].stop(brake);
