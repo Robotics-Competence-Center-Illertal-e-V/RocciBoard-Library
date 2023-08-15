@@ -37,3 +37,6 @@ doxygen_sqlite3.db
 html
 *.tmp
 docs/
+
+# Documentation
+extras/

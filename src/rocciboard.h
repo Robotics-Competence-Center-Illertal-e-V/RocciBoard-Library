@@ -105,12 +105,13 @@ class RocciBoard {
     void resetMultiplexer (void);
 
     /**
-     * Initializes a RocciBoard-Sensor on a given sensor port.
+     * Initializes a RocciBoard-Sensor on a given sensor port using the Multiplexer.
+     * The TCA9548A-object is injected into the sensor.
      * @param sensor pointer to the object of the sensor (e.g. &compass)
      * @param sensor_port I2C-port of the sensor to initialize
      * @ingroup sensor_functions
     */
-    void initSensor (RBSensor *sensor, uint8_t sensor_port);
+    void initRBSensor (RBSensor *sensor);
 
     /** @defgroup addtitional_features Additional Features and Functions */
 

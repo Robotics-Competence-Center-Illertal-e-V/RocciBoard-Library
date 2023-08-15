@@ -41,14 +41,12 @@ class RBLaser : public RBSensor
          * Initializes the VL53L0X and VL53L1X compass sensor
         */    
         virtual bool init(void);
-        void init_NoMux(void);
 
         /**
          * Reads the current distance that the laser-sensor measures
          * @return uint16_t: distance in millimeters
          */
         uint16_t getDistanceMillimeters(void);
-        uint16_t getDistanceMillimeters_NoMux(void);
 
     private:
         bool long_range_;

@@ -55,10 +55,9 @@ void RocciBoard::resetMultiplexer (void)
     pinMode(RB_MUX_RESET, INPUT_PULLUP);
 }
 
-void RocciBoard::initSensor (RBSensor *sensor, uint8_t sensor_port)
+void RocciBoard::initRBSensor (RBSensor *sensor)
 {
     sensor->setMultiplexer(&tca_);
-    sensor->setSensorPort(sensor_port);
     sensor->init();
 }
 

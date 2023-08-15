@@ -1,3 +1,16 @@
+/**
+ * RocciBoard Driving Example
+ * 
+ * AUTHOR: Jonas Biener (<jonas.biener@rocci.net>) for the Robotics Competence Center Illertal e. V. (<https://rocci.net>) 
+ * COPYRIGHT: Copyright (c) 2023 Robotics Competence Center Illertal e. V.
+ * VERSION: 1.0 [09-2023] First release
+ * 
+ * This example demonstrates the use of the RocciBoard-Motor-Functions.
+ * After initialization the motors are conteolled on a timed basis.
+ * The example uses a custom defined function stopAllMotors(bool brake) to stop all motors,
+ * which shows the adaptability of the library to your own functions.
+ */
+
 #include "rocciboard.h"     // Include the RocciBoard Library
 
 RocciBoard rb;
@@ -5,7 +18,7 @@ RocciBoard rb;
 void setup() {
 
     Serial.begin(9600);     // Establish Serial Connection with the PC
-    rb.init();              // Initialize RocciBoard and Sensors
+    rb.init();              // Initialize RocciBoard
     
 }
 
