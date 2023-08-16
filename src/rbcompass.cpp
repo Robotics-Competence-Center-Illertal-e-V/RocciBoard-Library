@@ -37,7 +37,7 @@ int16_t RBCompass::getRoll(void)
     return data_.orientation.z;
 }
 
-int8_t RBCompass::getTemperature(void)
+int8_t RBCompass::getTemperatureCelsius(void)
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
     int8_t temp = bno_.getTemp();

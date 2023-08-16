@@ -32,17 +32,17 @@ void RocciBoard::init (void)
     blinkDebugLED();
 }
 
-void RocciBoard::openSensorChannel (uint8_t sensor_port)
+void RocciBoard::openSensorPort (uint8_t sensor_port)
 {
     tca_.openChannel(sensor_port);
 }
 
-void RocciBoard::closeSensorChannel (uint8_t sensor_port)
+void RocciBoard::closeSensorPort (uint8_t sensor_port)
 {
     tca_.closeChannel(sensor_port);
 }
 
-void RocciBoard::closeAllSensorChannels (void)
+void RocciBoard::closeAllSensorPorts (void)
 {
     tca_.closeAll();
 }

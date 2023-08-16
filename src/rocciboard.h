@@ -66,41 +66,32 @@ class RocciBoard {
     */
     RocciBoard (void);
 
-    /** @defgroup general_functions General Functions */
-
     /**
      * Initializes the RocciBoard
-     * @ingroup general_functions
      * @return bool : Initialization successful
     */
     void init (void);
-
-    /** @defgroup sensor_functions Sensors and their functions */
 
     /**
      * Opens a sensor-channel on the I²C-Multiplexer. \n 
      * (WARNING: Be sure to always close the channel after use!)
      * @param sensor_port port/channel of the sensor
-     * @ingroup sensor_functions
     */
-    void openSensorChannel (uint8_t sensor_port);
+    void openSensorPort (uint8_t sensor_port);
     
     /**
      * Closes a sensor-channel on the I²C-Multiplexer.
      * @param sensor_port port/channel of the sensor
-     * @ingroup sensor_functions
     */
-    void closeSensorChannel (uint8_t sensor_port);
+    void closeSensorPort (uint8_t sensor_port);
 
     /**
      * Closes all sensor-channels on the I²C-Multiplexer.
-     * @ingroup sensor_functions
     */
-    void closeAllSensorChannels (void);
+    void closeAllSensorPorts (void);
 
     /**
      * Resets the I²C-multiplexer by using its reset-pin.
-     * @ingroup sensor_functions
     */
     void resetMultiplexer (void);
 
@@ -109,16 +100,12 @@ class RocciBoard {
      * The TCA9548A-object is injected into the sensor.
      * @param sensor pointer to the object of the sensor (e.g. &compass)
      * @param sensor_port I2C-port of the sensor to initialize
-     * @ingroup sensor_functions
     */
     void initRBSensor (RBSensor *sensor);
-
-    /** @defgroup addtitional_features Additional Features and Functions */
 
     /**
      * Returns the current voltage of the robots battery
      * @return float : battery voltage of the robot
-     * @ingroup addtitional_features
     */
     float getBatteryVoltage (void);
 
@@ -126,7 +113,6 @@ class RocciBoard {
      * Returns the current state-of-charge of the robots battery \n
      * (WARNING: Does only work with LiPo 3S batteries! Treat values with caution! Use getBatteryVoltage() for accurate measurement!)
      * @return int8_t : state-of-charge of the battery in percent (0-100)
-     * @ingroup addtitional_features
     */
     uint8_t getBatteryCharge (void);
 

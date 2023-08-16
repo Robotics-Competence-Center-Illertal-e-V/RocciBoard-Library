@@ -35,7 +35,7 @@ class RBLaser : public RBSensor
          * Sets the sensor-type to either VL53L0X (short-range) or VL53L1X (long-range).
          * @param is_long_range false to select VL53L0X, true to select VL53L1X
          */
-        RBLaser(bool is_long_range);
+        RBLaser(uint8_t sensor_port, bool is_long_range) : RBSensor(sensor_port);
 
         /**
          * Initializes the VL53L0X and VL53L1X compass sensor
@@ -47,6 +47,30 @@ class RBLaser : public RBSensor
          * @return uint16_t: distance in millimeters
          */
         uint16_t getDistanceMillimeters(void);
+
+        /**
+         * Reads the current distance that the laser-sensor measures
+         * @return uint16_t: distance in centimeters
+         */
+        float getDistanceCentimeters(void);
+
+        /**
+         * Reads the current distance that the laser-sensor measures
+         * @return uint16_t: distance in meters
+         */
+        float getDistanceMeters(void);
+
+        /**
+         * Reads the current distance that the laser-sensor measures
+         * @return uint16_t: distance in inches
+         */
+        float getDistanceInches(void);
+
+        /**
+         * Reads the current distance that the laser-sensor measures
+         * @return uint16_t: distance in feet
+         */
+        float getDistanceFeet(void);
 
     private:
         bool long_range_;

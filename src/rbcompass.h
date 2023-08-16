@@ -56,7 +56,7 @@ class RBCompass : public RBSensor {
          * Returns the ambient temperature of the compass sensor
          * @return int8_t : temperature in °C
          */
-        int8_t getTemperature (void);
+        int8_t getTemperatureCelsius (void);
 
         /**
          * Returns the orientation-vector of the robot

@@ -4,7 +4,7 @@
 
 #include "rblaser.h"
 
-RBLaser::RBLaser (bool is_long_range)
+RBLaser::RBLaser (bool is_long_range) : RBSensor(sensor_port)
 {
     long_range_ = is_long_range;
 }
@@ -36,4 +36,24 @@ uint16_t RBLaser::getDistanceMillimeters(void)
     uint16_t measurement = long_range_ ? l1x_.readRangeContinuousMillimeters() : l0x_.readRangeContinuousMillimeters();
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
     return measurement;
+}
+
+float RBLaser::getDistanceCentimeters(void)
+{
+    return (float)getDistanceMillimeters() / 10.0f;
+}
+
+float RBLaser::getDistanceMeters(void)
+{
+    return (float)getDistanceMillimeters() / 1000.0f;
+}
+
+float RBLaser::getDistanceInches(void)
+{
+    return (float)getDistanceMillimeters() / 25.4f;
+}
+
+float RBLaser::getDistanceFeet(void)
+{
+    return (float)getDistanceMillimeters() / 304.8f;
 }
