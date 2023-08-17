@@ -55,10 +55,10 @@ void RocciBoard::resetMultiplexer (void)
     pinMode(RB_MUX_RESET, INPUT_PULLUP);
 }
 
-void RocciBoard::initRBSensor (RBSensor *sensor)
+void RocciBoard::initRBSensor (RBSensor &sensor)
 {
-    sensor->setMultiplexer(&tca_);
-    sensor->init();
+    sensor.setMultiplexer(&tca_);
+    sensor.init();
 }
 
 #if defined(ARDUINO_ARCH_AVR)

@@ -184,11 +184,11 @@ Nun kann entweder ein weiterer Kanal geöffnet werden oder mit der Ausführung d
 
 > Die standardisierten Sensoren können auch ohne den Multiplexer direkt an einen I²C-Bus des Arduino angeschlossen werden. Dies ist allerdings nicht empfehlenswert, da Probleme wie Adresskonflikte auftreten können. Deshalb sollte dies nur von fortgeschrittenen Benutzern durchgeführt werden.
 
-Die RBSensor-Sensoren werden statt mit dem Sensor-Port mit der Konstante `RB_NO_MULTIPLEXER` deklariert. Hierdurch wird die Multiplexer-Funktionalität der Sensoren deaktiviert. 
-Die Initialisierung findet wie gewohnt über das RocciBoard mit `rb.initRBSensor(&sensor)` statt. Alternativ kann der Sensor auch direkt mit `sensor.init()` initialisiert werden.
+Die RBSensor-Sensoren werden statt mit dem Sensor-Port mit der dem Wire-Objekt des jeweiligen nativem I²C-Busses deklariert, also mit `Wire` für den Standard-I²C, `Wire1` für I²C-1 oder `Wire2`für I²C-2. Hierdurch wird die Multiplexer-Funktionalität der Sensoren deaktiviert und der gewünschte I²C-Bus aktiviert. 
+Die Initialisierung findet wie gewohnt über das RocciBoard mit `rb.initRBSensor(sensor)` statt. Alternativ kann der Sensor auch direkt mit `sensor.init()` initialisiert werden.
 
 ```cpp
-    RBCompass compass(RB_NO_MULTIPLEXER);
+    RBCompass compass(Wire1);
     void setup() {
          rb.initRBSensor(compass);
     }

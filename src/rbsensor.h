@@ -11,6 +11,7 @@
 #define rbsensor_h
 
 #include "Arduino.h"
+#include "Wire.h"
 #include "TCA9548A.h"
 
 #define RB_NO_MULTIPLEXER -2
@@ -31,25 +32,27 @@ class RBSensor
 
         /**
          * Creates the RBSensor-Object for a Multiplexer setup.
-         * @param sensor_port new port of the sensor
+         * @param sensor_port port of the sensor
          */
         RBSensor(uint8_t sensor_port)
         {
             sensor_port_ = sensor_port;
+            wire_ = &Wire;
         }
 
         /**
-         * Sets the I²C-port of the sensor to a given port.
-         * @param sensor_port new port of the sensor
+         * Creates the RBSensor-Object for a No-Multiplexer setup.
+         * @param i2c_wire Wire-object of the I²C-bus to use
          */
-        void setSensorPort(uint8_t sensor_port)
+        RBSensor(Wire &i2c_wire)
         {
-            sensor_port_ = sensor_port;
+            sensor_port_ = RB_NO_MULTIPLEXER;
+            wire_ = &i2c_bus;
         }
 
         /**
          * Returns the current I²C-port of the sensor.
-         * @return uint8_t: the current I²C-port
+         * @return uint8_t: the I²C-mux-port of the sensor
          */
         uint8_t getSensorPort(void)
         {
@@ -57,12 +60,21 @@ class RBSensor
         }
 
         /**
+         * Returns the Wire-object of the sensor.
+         * @return Wire: Wire-object of the sensor
+         */
+        Wire* getWire(void)
+        {
+            return wire_;
+        }
+
+        /**
          * Sets the TCA9548A-I²C-Multiplexer of the sensor.
          * @param tca pointer to new multiplexer of the sensor
          */
-        void setMultiplexer(TCA9548A &tca_mux)
+        void setMultiplexer(TCA9548A* tca_mux)
         {
-            tca_ = &tca_mux;
+            tca_ = tca_mux;
         }
 
         /**
@@ -77,6 +89,7 @@ class RBSensor
     protected:
         uint8_t sensor_port_;
         TCA9548A* tca_;
+        Wire* wire_;
 
 };
 

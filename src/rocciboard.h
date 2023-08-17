@@ -101,7 +101,7 @@ class RocciBoard {
      * @param sensor pointer to the object of the sensor (e.g. &compass)
      * @param sensor_port I2C-port of the sensor to initialize
     */
-    void initRBSensor (RBSensor *sensor);
+    void initRBSensor (RBSensor &sensor);
 
     /**
      * Returns the current voltage of the robots battery
