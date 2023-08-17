@@ -24,7 +24,7 @@ void setup() {
     rb.init();              // Initialize RocciBoard
 
     // Initialize compass-sensor without the I²C-multiplexer
-    compass.init();   
+    rb.initRBSensor(compass);   
     
 }
 

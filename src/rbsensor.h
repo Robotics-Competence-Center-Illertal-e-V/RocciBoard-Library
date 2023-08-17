@@ -60,9 +60,9 @@ class RBSensor
          * Sets the TCA9548A-I²C-Multiplexer of the sensor.
          * @param tca pointer to new multiplexer of the sensor
          */
-        void setMultiplexer(TCA9548A* tca_mux)
+        void setMultiplexer(TCA9548A &tca_mux)
         {
-            tca_ = tca_mux;
+            tca_ = &tca_mux;
         }
 
         /**

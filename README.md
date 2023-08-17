@@ -90,13 +90,13 @@ oder ob er bis zum Stillstand auslaufen soll. Der Parameter `brake` ist optional
 
 Das **RBSensor-Interface** ermöglicht eine einfache Deklaration und Initialisierung der Sensoren und eine reibungsfreie Verwendung.    
 **Zunächst muss der jeweilige Sensor deklariert werden**. Dies geschieht durch Erzeugen eines Sensorobjektes mit `RBSensor sensor(1)` unter Angabe des zu verwendenden Ports. `RBSensor` wird hier durch die gewünschte Sensorklasse ersetzt, `sensor` durch den zugewiesenen Namen des Sensors und `1` durch den Port des Sensors am RocciBoard (von 0 bis 7).    
-**In der Setup-Funktion muss der Sensor dann initialisiert werden.** Diese Aufgabe wird durch das RocciBoard erledigt, welches dem Sensor den Multiplexer zuweist und die Initialisierung des Sensors anstößt. Die Funktion lautet `rb.initRBSensor(&sensor)`. Der zu initialisierende Sensor `sensor` wird hier mit dem `&`-Operator als Objekt (Zeiger) übergeben.   
+**In der Setup-Funktion muss der Sensor dann initialisiert werden.** Diese Aufgabe wird durch das RocciBoard erledigt, welches dem Sensor den Multiplexer zuweist und die Initialisierung des Sensors anstößt. Die Funktion lautet `rb.initRBSensor(sensor)`. Der zu initialisierende Sensor `sensor` wird hier mit dem als Objekt (Referenz) übergeben.   
 
 > Diese Art der Deklaration und Initialisierung kann auf alle unten aufgelisteten, standardisierten Sensoren angewandt werden.
 
 ```cpp
     RBCompass compass(0);
-    void Setup() {
+    void setup() {
         rb.initRBSensor(&compass);
     }
 ```
@@ -121,7 +121,7 @@ Der Kompass-Sensor wird als Objekt mit `RBCompass compass(1)` eingebunden, wobei
 ```cpp
     RBCompass compass(2);
     void setup() {
-        rb.initRBSensor(&compass);
+        rb.initRBSensor(compass);
     }
     void loop() {
         int pitch = compass.getPitch();
@@ -152,7 +152,7 @@ Der Laser-Sensor wird als Objekt mit `RBLaser laser(1, TYPE_LONGRANGE)` eingebun
 ```cpp
     RBLaser laser(5, TYPE_SHORTRANGE);
     void setup() {
-        rb.initRBSensor(&laser);
+        rb.initRBSensor(laser);
     }
     void loop() {
         int distance = laser.getDistanceMillimeters();
@@ -189,7 +189,7 @@ Die Initialisierung findet wie gewohnt über das RocciBoard mit `rb.initRBSensor
 
 ```cpp
     RBCompass compass(RB_NO_MULTIPLEXER);
-    void Setup() {
-         rb.initRBSensor(&compass);
+    void setup() {
+         rb.initRBSensor(compass);
     }
 ```

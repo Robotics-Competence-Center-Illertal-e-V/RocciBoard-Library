@@ -24,7 +24,7 @@ void setup() {
     rb.init();              // Initialize RocciBoard
 
     // Initialize compass-sensor through the RocciBoard
-    rb.initRBSensor(&compass);
+    rb.initRBSensor(compass);
     
 }
 

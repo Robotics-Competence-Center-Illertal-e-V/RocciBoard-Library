@@ -24,7 +24,7 @@ void setup() {
     rb.init();              // Initialize RocciBoard
 
     // Initialize laser-sensor on sensor-port 1
-    rb.initSensor(&laser, 1);
+    rb.initSensor(laser, 1);
     
 }
 

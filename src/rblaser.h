@@ -23,7 +23,6 @@
 
 /**
  * Class for implementing the VL53L0X and VL53L1X laser-sensors for easy usage.
- * _NoMux: Disables the default I²C-sensor-multiplexing of the RocciBoard so that the sensor can be used on regular I²C.
  */
 class RBLaser : public RBSensor
 {
