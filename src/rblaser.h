@@ -51,33 +51,38 @@ class RBLaser : public RBSensor
 
         /**
          * Reads the current distance that the laser-sensor measures
+         * @param blocking laser should wait for the next reading
          * @return uint16_t: distance in millimeters
          */
-        uint16_t getDistanceMillimeters(void);
+        uint16_t getDistanceMillimeters(bool blocking = true);
 
         /**
          * Reads the current distance that the laser-sensor measures
+         * @param blocking laser should wait for the next reading
          * @return uint16_t: distance in centimeters
          */
-        float getDistanceCentimeters(void);
+        float getDistanceCentimeters(bool blocking = true);
 
         /**
          * Reads the current distance that the laser-sensor measures
+         * @param blocking laser should wait for the next reading
          * @return uint16_t: distance in meters
          */
-        float getDistanceMeters(void);
+        float getDistanceMeters(bool blocking = true);
 
         /**
          * Reads the current distance that the laser-sensor measures
+         * @param blocking laser should wait for the next reading
          * @return uint16_t: distance in inches
          */
-        float getDistanceInches(void);
+        float getDistanceInches(bool blocking = true);
 
         /**
          * Reads the current distance that the laser-sensor measures
+         * @param blocking laser should wait for the next reading
          * @return uint16_t: distance in feet
          */
-        float getDistanceFeet(void);
+        float getDistanceFeet(bool blocking = true);
 
     private:
         bool long_range_;
