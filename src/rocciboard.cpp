@@ -61,21 +61,25 @@ void RocciBoard::initRBSensor (RBSensor &sensor)
     sensor.init();
 }
 
-#if defined(ARDUINO_ARCH_AVR)
-    float RocciBoard::getBatteryVoltage (void)
-    {
-        return 0.000000f + 1.000000f * (float)analogRead(RB_BATTERY_ADC);
-    }
-#elif defined(ARDUINO_ARCH_SAM)
-    float RocciBoard::getBatteryVoltage (void)
-    {
-        return 0.000000f + 1.000000f * (float)analogRead(RB_BATTERY_ADC);
-    }
-#endif
+float RocciBoard::getBatteryVoltage (void)
+{
+    #if defined(ARDUINO_ARCH_AVR)
+        return 0.2805f + 0.0191f * (float)analogRead(RB_BATTERY_ADC);
+    #elif defined(ARDUINO_ARCH_SAM)
+        #warning "RocciBoard::getBatteryVoltage() is not available on Arduino ARM Boards"
+        return 0.0f;
+    #else
+        #warning "RocciBoard::getBatteryVoltage() is not available on this Board"
+        return 0.0f;
+    #endif
+}
+
 
 uint8_t RocciBoard::getBatteryCharge (void)
 {
-    return (uint8_t)(1.000000f * getBatteryVoltage());
+    uint8_t soc = -592.465f + 58.333f * getBatteryVoltage();
+    soc = max(min(soc, 100), 0);
+    return soc;
 }
 
 void RocciBoard::blinkDebugLED (void)

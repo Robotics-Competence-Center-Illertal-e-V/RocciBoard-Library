@@ -7,7 +7,7 @@
  * 
  * This example demonstrates the use of the RocciBoard-Laser-Sensor. (VL53L0X or VL53L1X)
  * The laser-sensor must be connected to one of the multiplexed sensor-ports of the RocciBoard.
- * Initialization is performed through the RocciBoard with initRBSensor(&laser) which injects the multiplexer in the sensor.
+ * Initialization is performed through the RocciBoard with initRBSensor(laser) which injects the multiplexer in the sensor.
  * All other RBSensors are also compatible with this schema and can be used accordingly.
  */
 

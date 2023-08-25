@@ -5,9 +5,9 @@
  * COPYRIGHT: Copyright (c) 2023 Robotics Competence Center Illertal e. V.
  * VERSION: 1.0 [09-2023] First release
  * 
- * This example demonstrates the use of the RocciBoard-Compass-Sensor. (BNO055)
- * The compass-sensor must be connected to one of the multiplexed sensor-ports of the RocciBoard.
- * Initialization is performed through the RocciBoard with initRBSensor(compass) which injects the multiplexer in the sensor.
+ * This example demonstrates the use of the RocciBoard-Color-Sensor. (BNO055)
+ * The color-sensor must be connected to one of the multiplexed sensor-ports of the RocciBoard.
+ * Initialization is performed through the RocciBoard with initRBSensor(color) which injects the multiplexer in the sensor.
  * All other RBSensors are also compatible with this schema and can be used accordingly.
  */
 
@@ -16,7 +16,7 @@
 RocciBoard rb;
 
 // Define compass-sensor on sensor-port 0
-RBCompass compass(0);
+RBColor color(0);
 
 void setup() {
 
@@ -24,20 +24,20 @@ void setup() {
     rb.init();              // Initialize RocciBoard
 
     // Initialize compass-sensor through the RocciBoard
-    rb.initRBSensor(compass);
+    rb.initRBSensor(color);
     
 }
 
 void loop() {
 
     // Print values to the Serial Monitor via Serial Port
-    Serial.print(" Heading: " + String(compass.getHeading()));
-    Serial.print(" Pitch: " + String(compass.getPitch()));
-    Serial.print(" Roll: " + String(compass.getRoll()));
+    Serial.print(" Red: " + String(color.getRed()));
+    Serial.print(" Green: " + String(color.getGreen()));
+    Serial.print(" Blue: " + String(color.getBlue()));
+    Serial.print(" Clear: " + String(color.getBlue()));
 
-    RBVector magneticField = compass.getVecMagneticField();
-    Serial.print(" Magnetic field: ");
-    Serial.println("( " + String(magneticField.x) + " , " + String(magneticField.y) + " , " + String(magneticField.z) + " )");
+    Serial.print(" Temperature: " + String(color.getColorTemperature()));
+    Serial.println(" Lux: " + String(color.getLux()));
 
     // Delay to keep values readable
     delay(500);
