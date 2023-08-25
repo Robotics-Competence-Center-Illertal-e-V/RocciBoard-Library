@@ -16,7 +16,7 @@
 RocciBoard rb;
 
 // Define laser-sensor on sensor-port 0
-RBLaser laser(TYPE_VL53L0X);
+RBLaser laser(0, TYPE_VL53L0X);
 
 void setup() {
 
@@ -24,14 +24,14 @@ void setup() {
     rb.init();              // Initialize RocciBoard
 
     // Initialize laser-sensor on sensor-port 1
-    rb.initSensor(laser, 1);
+    rb.initRBSensor(laser);
     
 }
 
 void loop() {
 
     // Print values to the Serial Monitor via Serial Port
-    Serial.print("Distance: " + laser.getDistanceMillimeters() + " mm");
+    Serial.println("Distance: " + String(laser.getDistanceMillimeters()) + " mm");
 
     // Delay to keep values readable
     delay(500);

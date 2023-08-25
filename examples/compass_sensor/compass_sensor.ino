@@ -31,13 +31,13 @@ void setup() {
 void loop() {
 
     // Print values to the Serial Monitor via Serial Port
-    Serial.print(" Heading: " + compass.getHeading());
-    Serial.print(" Pitch: " + compass.getPitch());
-    Serial.print(" Roll: " + compass.getRoll());
+    Serial.print(" Heading: " + String(compass.getHeading()));
+    Serial.print(" Pitch: " + String(compass.getPitch()));
+    Serial.print(" Roll: " + String(compass.getRoll()));
 
     RBVector magneticField = compass.getVecMagneticField();
     Serial.print(" Magnetic field: ");
-    Serial.println("( " + magneticField.x + " , " + magneticField.y + " , " + magneticField.z + " )");
+    Serial.println("( " + String(magneticField.x) + " , " + String(magneticField.y) + " , " + String(magneticField.z) + " )");
 
     // Delay to keep values readable
     delay(500);

@@ -4,12 +4,12 @@
 
 #include "rblaser.h"
 
-RBLaser::RBLaser (uint8_t sensor_port, bool is_long_range) : RBSensor(sensor_port)
+RBLaser::RBLaser (int8_t sensor_port, bool is_long_range) : RBSensor(sensor_port)
 {
     long_range_ = is_long_range;
 }
 
-RBLaser::RBLaser (Wire i2c_wire, bool is_long_range) : RBSensor(i2c_wire)
+RBLaser::RBLaser (TwoWire &i2c_wire, bool is_long_range) : RBSensor(i2c_wire)
 {
     long_range_ = is_long_range;
 }

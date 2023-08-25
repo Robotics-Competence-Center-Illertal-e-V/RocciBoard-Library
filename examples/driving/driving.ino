@@ -27,14 +27,14 @@ void loop() {
     // Drive forwards. Wait. Drive Backwards. Wait.
     rb.motor[0].rotate(100);
     rb.motor[1].rotate(100);
-    delay(1000);
+    delay(2000);
 
     stopAllMotors(true);
     delay(1000);
 
     rb.motor[0].rotate(-100);
     rb.motor[1].rotate(-100);
-    delay(1000);
+    delay(2000);
 
     stopAllMotors(true);
     delay(1000);

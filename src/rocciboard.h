@@ -43,7 +43,6 @@
 #define rocciboard_h
 
 #include "Arduino.h"
-#include "TCA9548A.h"
 
 #include "rbsensor.h"
 #include "rbmotor.h"

@@ -34,7 +34,7 @@ class RBSensor
          * Creates the RBSensor-Object for a Multiplexer setup.
          * @param sensor_port port of the sensor
          */
-        RBSensor(uint8_t sensor_port)
+        RBSensor(int8_t sensor_port)
         {
             sensor_port_ = sensor_port;
             wire_ = &Wire;
@@ -44,10 +44,10 @@ class RBSensor
          * Creates the RBSensor-Object for a No-Multiplexer setup.
          * @param i2c_wire Wire-object of the I²C-bus to use
          */
-        RBSensor(Wire &i2c_wire)
+        RBSensor(TwoWire &i2c_wire)
         {
             sensor_port_ = RB_NO_MULTIPLEXER;
-            wire_ = &i2c_bus;
+            wire_ = &i2c_wire;
         }
 
         /**
@@ -63,7 +63,7 @@ class RBSensor
          * Returns the Wire-object of the sensor.
          * @return Wire: Wire-object of the sensor
          */
-        Wire* getWire(void)
+        TwoWire* getWire(void)
         {
             return wire_;
         }
@@ -87,9 +87,9 @@ class RBSensor
         }
 
     protected:
-        uint8_t sensor_port_;
+        int8_t sensor_port_;
         TCA9548A* tca_;
-        Wire* wire_;
+        TwoWire* wire_;
 
 };
 

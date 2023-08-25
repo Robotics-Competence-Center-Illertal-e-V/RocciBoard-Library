@@ -34,7 +34,7 @@ class RBLaser : public RBSensor
          * @param sensor_port port of the sensor
          * @param is_long_range false to select VL53L0X, true to select VL53L1X
          */
-        RBLaser(uint8_t sensor_port, bool is_long_range) : RBSensor(sensor_port);
+        RBLaser(int8_t sensor_port, bool is_long_range);
 
         /**
          * Creates the RBLaser-object.
@@ -42,7 +42,7 @@ class RBLaser : public RBSensor
          * @param i2c_wire wire-object of the I²C-bus to use
          * @param is_long_range false to select VL53L0X, true to select VL53L1X
          */
-        RBLaser(Wire i2c_wire, bool is_long_range) : RBSensor(i2c_wire);
+        RBLaser(TwoWire &i2c_wire, bool is_long_range);
 
         /**
          * Initializes the VL53L0X and VL53L1X compass sensor

@@ -7,7 +7,7 @@
 bool RBCompass::init(void)
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
-    bool success = bno_.begin(wire_);
+    bool success = bno_.begin(); // Muss mit Adafruit I2C-Device gelöst
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
     return success;
 }
