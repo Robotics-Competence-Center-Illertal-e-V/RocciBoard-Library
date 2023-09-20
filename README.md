@@ -3,7 +3,9 @@
 > **Diese Bibliothek befindet sich noch in der Entwicklung !**    
 > Das Repository beinhaltet Projekte, Bibliotheken und Dateien, die für die Entwicklung der RocciBoard-Bibliothek notwendig sind. Funktionen und Komponenten der Bibliothek können Fehler und Bugs enthalten, unvollständig, ungetestet oder nur für den experimentellen Gebrauch bestimmt sein.Funktion und Vollständigkeit der Bibliothek können nicht garantiert werden, bitte den Inhalt daher mit Vorsicht genießen!  
 
-Das RocciBoard Arduino Shield des [Robotics Competence Center Illertal e. V.](https://rocci.net) ist eine Erweiterung des Arduino Mega bzw. Arduino Giga, die grundlegende Funktionen eines Roboters bereitstellt und eine Basis für eigene Ideen und Erweiterungen bietet. Die zugehörige Bibliothek wurde ebenfalls vom Arbeitskreis Entwicklung speziell für die Verwendung zu Unterrichtszwecken entwickelt. Sie bietet ein einfaches, intuitives und erweiterbares Framework für die Verwendung von Funktionen des Boards, von Motoren und Sensoren. Die Bibliothek ist nicht allzu umfangreich gehalten, um den Kursteilnehmern zwar die Programmierung des Arduinos realitätsnah zu vermitteln, komplexere Funktionen wie die Initialisierung aber zu vereinfachen.
+Das RocciBoard Arduino Shield des [Robotics Competence Center Illertal e. V.](https://rocci.net) ist eine Erweiterung des Arduino Mega bzw. Arduino Giga, die grundlegende Funktionen eines Roboters bereitstellt und eine Basis für eigene Ideen und Erweiterungen bietet. Die zugehörige Bibliothek wurde ebenfalls vom Arbeitskreis Entwicklung speziell für die Verwendung zu Unterrichtszwecken entwickelt. Sie bietet ein einfaches, intuitives und erweiterbares Framework für die Verwendung von Funktionen des Boards, von Motoren und Sensoren. Die Bibliothek ist nicht allzu umfangreich gehalten, um den Kursteilnehmern zwar die Programmierung des Arduinos realitätsnah zu vermitteln, komplexere Funktionen wie die Verwendung der Sensoren aber zu vereinfachen.
+
+Die RocciBoard-Bibliothek enthält **zahlreiche Beispielprogramme**, welche die Verwendung und Ansteuerung von Sensoren und Motoren demonstrieren. Ebenfalls verfügbar ist eine **RocciBoard-Projektvorlage** (*template.ino*), welche als vorstrukturierte, leere Vorlage verwendet werden kann. Sie beinhaltet bereits die wichtigsten Deklarationen und Anweisungen.
 
 > In der folgenden Dokumentation werden alle Funktionen ausgiebig erläutert und beschrieben.
 
@@ -11,10 +13,10 @@ Das RocciBoard Arduino Shield des [Robotics Competence Center Illertal e. V.](ht
 
 ## Grundlagen
 
-> Bibliotheken werden in der Sprache C++, in welcher das Arduino (und damit auch das RocciBoard) programmiert werden, meistens in sogenannten Header-Dateien zusammengefasst. Diese erkennt man an der Dateiendung ".h". Auch die RocciBoard-Library besteht aus solchen Header-Dateien und muss dem Projekt hinzugefügt werden.
+> Bibliotheken werden in der Programmiersprache C++, in welcher das Arduino (und damit auch das RocciBoard) programmiert werden, meistens in sogenannten Header-Dateien zusammengefasst. Diese erkennt man an der Dateiendung ".h". Auch die RocciBoard-Library besteht aus solchen Header-Dateien und muss dem Projekt hinzugefügt werden.
 
-Die Bibliothek wird durch `#include <rocciboard.h>` **in das Projekt eingebunden**. Diese Precompiler-Anweisung beinhaltet bereits alle benötigten Bibliotheken und Abhängigkeiten.    
-Um das RocciBoard zu verwenden, muss in der Deklarations-Sektion des Projektes zunächst ein **RocciBoard-Objekt deklariert werden**. Dies wird durch die Anweisung `RocciBoard rb` erreicht, wobei `rb` als Bezeichner des RocciBoard-Objektes frei wählbar ist. Dieser festgelegte Name muss allerdings bei allen weiteren Aufrufen verwendet werden. In dieser Dokumentation wird der Bezeichner `rb` beibehalten.    
+Die Bibliothek wird durch `#include <rocciboard.h>` **in das Projekt eingebunden**. Diese sogenannte Precompiler-Anweisung beinhaltet bereits alle benötigten Bibliotheken und Abhängigkeiten.    
+Um das RocciBoard zu verwenden, muss in der Deklarations-Sektion (oberer Teil des Programms, außerhalb von Funktionen) des Projektes zunächst ein **RocciBoard-Objekt deklariert werden**. Dies wird durch die Anweisung `RocciBoard rb` erreicht, wobei `rb` als Bezeichner des RocciBoard-Objektes frei wählbar ist. Dieser festgelegte Name muss allerdings bei allen weiteren Aufrufen verwendet werden. In dieser Dokumentation wird der Bezeichner `rb` beibehalten.    
 Das RocciBoard muss vor der **erstmaligen Verwendung initialisiert** werden, dazu wird die Funktion `rb.init()` aufgerufen.    
 
 ```cpp
@@ -33,11 +35,11 @@ Das RocciBoard muss vor der **erstmaligen Verwendung initialisiert** werden, daz
 
 Die Grundfunktionen des RocciBoard **befinden sich im RocciBoard-Object** und können über dieses aufgerufen werden.
 
-* `[float] getBatteryVoltage()` - Gibt die aktuelle Versorgungsspannung des RocciBoard (also der Batterie bzw. des angeschlossenen Netzteils) zurück.
+* `[float] getBatteryVoltage()` - Gibt die aktuelle Versorgungsspannung des RocciBoards (also der Batterie bzw. des angeschlossenen Netzteils) zurück.
 ```cpp
     float battery_voltage = rb.getBatteryVoltage();
 ```
-* `[uint8_t] getBatteryCharge()` - Gibt den aktuell errechneten Ladezustand der Batterie von 0 bis 100 Prozent zurück. Falls das RocciBoard an eine externe Stromversorgung angeschlossen ist, ergibt dieser Wert möglicherweise keinen Sinn.
+* `[uint8_t] getBatteryCharge()` - Gibt den aktuell errechneten Ladezustand der Batterie von 0 bis 100 Prozent zurück. (Falls das RocciBoard an eine externe Stromversorgung angeschlossen ist, ergibt dieser Wert möglicherweise keinen Sinn)
 ```cpp
     int battery_charge = rb.getBatteryCharge();
 ```
@@ -68,8 +70,8 @@ Die Geschwindigkeit wird von -255 bis +255 angegeben, negative Werte lassen den 
     rb.motor[3].rotate(-200);
     rb.motor[EINE_INT_KONSTANTE].rotate(eine_int_variable);
 ```
-* `[void] stop(bool brake)` - Der Motor wird gestoppt. `brake` gibt an, ob der Motor elektromechanisch gebremst wird 
-oder ob er bis zum Stillstand auslaufen soll. Der Parameter `brake` ist optional und wird bei weglassen durch `true` ersetzt.
+* `[void] stop(bool brake)` - Der Motor wird gestoppt. Der Parameter `brake` gibt an, ob der Motor elektromechanisch gebremst wird 
+oder ob er bis zum Stillstand auslaufen soll. Er ist optional und wird bei weglassen durch `true` ersetzt.
 ```cpp
     rb.motor[1].stop();
     rb.motor[2].stop(false);
@@ -97,7 +99,7 @@ Das **RBSensor-Interface** ermöglicht eine einfache Deklaration und Initialisie
 ```cpp
     RBCompass compass(0);
     void setup() {
-        rb.initRBSensor(&compass);
+        rb.initRBSensor(compass);
     }
 ```
 
@@ -125,6 +127,7 @@ Der Kompass-Sensor wird als Objekt mit `RBCompass compass(1)` eingebunden, wobei
     }
     void loop() {
         int pitch = compass.getPitch();
+        RBVector magnetic_field_vec = compass.getVecMagneticField();
     }
 ```
 
@@ -159,6 +162,29 @@ Der Laser-Sensor wird als Objekt mit `RBLaser laser(1, TYPE_LONGRANGE)` eingebun
     }
 ```
 
+#### Farb-Reflexions-Sensor (TCS34725)
+
+> Der TCS34725 Farb-Reflexions-Sensor kann die Farben seiner Umgebung messen und auswerten. Dafür emittiert er Licht über seine interne LED, welches von der zu messenden Oberfläche reflektiert wird. Die farbliche Zusammensetzung dieses Lichts wird anschließend durch mehrere Sensoreinheiten mit Farbfiltern bestimmt.
+
+Der Farb-Reflexions-Sensor wird als Objekt mit `RBColor color(1)` eingebunden, wobei der Name des Sensors `color` frei wählbar ist. Der übergebene Wert `1` gibt den Sensor-Port des Sensors am RocciBoard an.
+
+* `[uint16_t] getRed()` - Gibt den aktuell gemessenen Reflexionswert der Farbe Rot zurück.
+* `[uint16_t] getGreen()` - Gibt den aktuell gemessenen Reflexionswert der Farbe Grün zurück.
+* `[uint16_t] getBlue()` - Gibt den aktuell gemessenen Reflexionswert der Farbe Blau zurück.
+* `[uint16_t] getClear()` - Gibt den aktuell gemessenen, farblosen (über alle Farben gemittelten) Reflexionswert zurück.
+* `[uint16_t] getColorTemperature()` - Gibt die aktuell errechnete Farbtemperatur der Reflexion in Kelvin zurück.
+* `[uint16_t] getLux()` - Gibt die aktuell errechnete Beleuchtungsstärke des Sensors in Lux zurück.
+
+```cpp
+    RBColor color(3);
+    void setup() {
+        rb.initRBSensor(color);
+    }
+    void loop() {
+        int red = color.getRed();
+    }
+```
+
 ---
 
 ## Nicht-standardisierte Sensoren
@@ -168,7 +194,8 @@ Der Laser-Sensor wird als Objekt mit `RBLaser laser(1, TYPE_LONGRANGE)` eingebun
 Bevor eine Anweisung eines Sensors, der eine Kommunikation über I²C verwendet, ausgeführt werden kann, **muss der jeweilige Port des Multiplexers geöffnet werden**. Dazu wird die Funktion `rb.openSensorPort(1)` aufgerufen, welche den Sensorport `1` zur Kommunikation mit dem Sensor öffnet.    
 Wenn der Kanal geöffnet ist, **kann die Anweisung des Sensors ausgeführt werden**, beispielsweise eine Initialisierung oder eine Abfrage der Sensorwerte.    
 Nach der Benutzung des Sensor **muss der Port wieder geschlossen werden**, um die Kommunikation mit anderen Sensoren nicht zu stören. Dies wird mit der Funktion `rb.closeSensorPort(1)` erreicht.    
-Nun kann entweder ein weiterer Kanal geöffnet werden oder mit der Ausführung des restlichen Programmes fortgefahren werden. 
+Nun kann entweder ein weiterer Kanal geöffnet werden oder mit der Ausführung des restlichen Programmes fortgefahren werden.    
+*Alternativ zu einem spezifischen Kanal können mit `rb.closeAllSensorPorts()` auch alle Kanäle geschlossen werden.*
 
 > Neben Sensoren können mit dieser Vorgehensweise auch andere I²C-Geräte eingebunden werden.
 
@@ -184,6 +211,8 @@ Nun kann entweder ein weiterer Kanal geöffnet werden oder mit der Ausführung d
 
 > Die standardisierten Sensoren können auch ohne den Multiplexer direkt an einen I²C-Bus des Arduino angeschlossen werden. Dies ist allerdings nicht empfehlenswert, da Probleme wie Adresskonflikte auftreten können. Deshalb sollte dies nur von fortgeschrittenen Benutzern durchgeführt werden.
 
+**Die Verwendung des Kompass-Sensors wird über dieses Interface aktuell nicht unterstützt!**
+
 Die RBSensor-Sensoren werden statt mit dem Sensor-Port mit der dem Wire-Objekt des jeweiligen nativem I²C-Busses deklariert, also mit `Wire` für den Standard-I²C, `Wire1` für I²C-1 oder `Wire2`für I²C-2. Hierdurch wird die Multiplexer-Funktionalität der Sensoren deaktiviert und der gewünschte I²C-Bus aktiviert. 
 Die Initialisierung findet wie gewohnt über das RocciBoard mit `rb.initRBSensor(sensor)` statt. Alternativ kann der Sensor auch direkt mit `sensor.init()` initialisiert werden.
 
@@ -193,3 +222,11 @@ Die Initialisierung findet wie gewohnt über das RocciBoard mit `rb.initRBSensor
          rb.initRBSensor(compass);
     }
 ```
+
+---
+
+**Jonas Biener und Alexander Ulbrich (2023-09)**    
+Robotics Competence Center Illertal e. V.    
+Sachsenstraße 12, 89250 Senden (Germany)    
+
+---
