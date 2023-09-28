@@ -12,44 +12,44 @@ bool RBColor::init(void)
     return success;
 }
 
-uint16_t RBLaser::getData(void)
+void RBColor::getData(void)
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
-    tcs.getRawData(&red_, &green_, &blue_, &clear_);
+    tcs_.getRawData(&red_, &green_, &blue_, &clear_);
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
 }
 
-uint16_t RBLaser::getRed(void)
+uint16_t RBColor::getRed(void)
 {
     getData();
     return red_;
 }
 
-uint16_t RBLaser::getGreen(void)
+uint16_t RBColor::getGreen(void)
 {
     getData();
     return green_;
 }
 
-uint16_t RBLaser::getBlue(void)
+uint16_t RBColor::getBlue(void)
 {
     getData();
     return blue_;
 }
 
-uint16_t RBLaser::getClear(void)
+uint16_t RBColor::getClear(void)
 {
     getData();
     return clear_;
 }
 
-uint16_t RBLaser::getColorTemperature(void)
+uint16_t RBColor::getColorTemperature(void)
 {
     getData();
-    return tcs_.calculateColorTemperature(uint16_t r, uint16_t g, uint16_t b);
+    return tcs_.calculateColorTemperature(red_, green_, blue_);
 }
 
-uint16_t RBLaser::getLux(void)
+uint16_t RBColor::getLux(void)
 {
     getData();
     return tcs_.calculateLux(red_, green_, blue_);

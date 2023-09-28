@@ -6,7 +6,7 @@
  * VERSION: 1.0 [09-2023] First release
  * 
  * This example demonstrates the use of the RocciBoard-Motor-Functions.
- * After initialization the motors are conteolled on a timed basis.
+ * After initialization the motors are controlled on a timed basis.
  * The example uses a custom defined function stopAllMotors(bool brake) to stop all motors,
  * which shows the adaptability of the library to your own functions.
  */
