@@ -1,7 +1,7 @@
 # RocciBoard-Library
 
-> **Diese Bibliothek befindet sich noch in der Entwicklung !**    
-> Das Repository beinhaltet Projekte, Bibliotheken und Dateien, die für die Entwicklung der RocciBoard-Bibliothek notwendig sind. Funktionen und Komponenten der Bibliothek können Fehler und Bugs enthalten, unvollständig, ungetestet oder nur für den experimentellen Gebrauch bestimmt sein.Funktion und Vollständigkeit der Bibliothek können nicht garantiert werden, bitte den Inhalt daher mit Vorsicht genießen!  
+> GitHub-Repository der RocciBoard-Library:     
+[https://github.com/Robotics-Competence-Center-Illertal-e-V/RocciBoard-Library](https://github.com/Robotics-Competence-Center-Illertal-e-V/RocciBoard-Library)
 
 Das RocciBoard Arduino Shield des [Robotics Competence Center Illertal e. V.](https://rocci.net) ist eine Erweiterung des Arduino Mega bzw. Arduino Giga, die grundlegende Funktionen eines Roboters bereitstellt und eine Basis für eigene Ideen und Erweiterungen bietet. Die zugehörige Bibliothek wurde ebenfalls vom Arbeitskreis Entwicklung speziell für die Verwendung zu Unterrichtszwecken entwickelt. Sie bietet ein einfaches, intuitives und erweiterbares Framework für die Verwendung von Funktionen des Boards, von Motoren und Sensoren. Die Bibliothek ist nicht allzu umfangreich gehalten, um den Kursteilnehmern zwar die Programmierung des Arduinos realitätsnah zu vermitteln, komplexere Funktionen wie die Verwendung der Sensoren aber zu vereinfachen.
 
