@@ -37,30 +37,30 @@ bool RBLaser::init(void)
     return true;
 }
 
-uint16_t RBLaser::getDistanceMillimeters(void)
+uint16_t RBLaser::getDistanceMillimeters(bool blocking)
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
-    uint16_t measurement = long_range_ ? l1x_.readRangeContinuousMillimeters() : l0x_.readRangeContinuousMillimeters();
+    uint16_t measurement = long_range_ ? l1x_.readRangeContinuousMillimeters(blocking) : l0x_.readRangeContinuousMillimeters();
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
     return measurement;
 }
 
-float RBLaser::getDistanceCentimeters(void)
+float RBLaser::getDistanceCentimeters(bool blocking)
 {
-    return (float)getDistanceMillimeters() / 10.0f;
+    return (float)getDistanceMillimeters(blocking) / 10.0f;
 }
 
-float RBLaser::getDistanceMeters(void)
+float RBLaser::getDistanceMeters(bool blocking)
 {
-    return (float)getDistanceMillimeters() / 1000.0f;
+    return (float)getDistanceMillimeters(blocking) / 1000.0f;
 }
 
-float RBLaser::getDistanceInches(void)
+float RBLaser::getDistanceInches(bool blocking)
 {
-    return (float)getDistanceMillimeters() / 25.4f;
+    return (float)getDistanceMillimeters(blocking) / 25.4f;
 }
 
-float RBLaser::getDistanceFeet(void)
+float RBLaser::getDistanceFeet(bool blocking)
 {
-    return (float)getDistanceMillimeters() / 304.8f;
+    return (float)getDistanceMillimeters(blocking) / 304.8f;
 }

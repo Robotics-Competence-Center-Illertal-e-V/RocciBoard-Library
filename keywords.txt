@@ -3,6 +3,7 @@ RBVector    KEYWORD1
 RBSensor    KEYWORD1
 RBLaser     KEYWORD1
 RBCompass   KEYWORD1
+RBColor   KEYWORD1
 RBMotor     KEYWORD1
 motor	    KEYWORD1
 
