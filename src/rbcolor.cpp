@@ -7,7 +7,7 @@
 bool RBColor::init(void)
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
-    bool success = tcs_.begin(&wire_);
+    bool success = tcs_.begin(TCS34725_ADDRESS , wire_);
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
     return success;
 }
