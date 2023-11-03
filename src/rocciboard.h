@@ -29,6 +29,7 @@
 #include "rbmotor.h"
 #include "rbcompass.h"
 #include "rblaser.h"
+#include "rbcolor.h"
 
 #define RB_DEBUG_LED 13
 #define RB_BATTERY_ADC A0
