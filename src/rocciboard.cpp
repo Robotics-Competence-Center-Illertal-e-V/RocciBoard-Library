@@ -2,6 +2,7 @@
  * @file rocciboard.cpp
 */
 
+#include "Arduino.h"
 #include "rocciboard.h"
 
 RocciBoard::RocciBoard (void)

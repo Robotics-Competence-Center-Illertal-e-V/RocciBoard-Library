@@ -2,6 +2,7 @@
  * @file rbmotor.cpp
 */
 
+#include "Arduino.h"
 #include "rbmotor.h"
 
 RBMotor::RBMotor (uint8_t pin_1, uint8_t pin_2)

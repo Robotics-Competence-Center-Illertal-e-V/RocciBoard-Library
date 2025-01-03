@@ -7,10 +7,8 @@
  * @version 1.0 [09-2023] First stable release
 */
 
-#ifndef rbmotor_h
-#define rbmotor_h
-
-#include "Arduino.h"
+#ifndef _RB_MOTOR_H_
+#define _RB_MOTOR_H_
 
 /**
  * Helper class for implementing motors for easy usage. \n

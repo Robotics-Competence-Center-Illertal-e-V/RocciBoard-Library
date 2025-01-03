@@ -20,10 +20,8 @@
  * 1.0 [09-2023] First stable release
 */
 
-#ifndef rocciboard_h
-#define rocciboard_h
-
-#include "Arduino.h"
+#ifndef _RB_ROCCIBOARD_H_
+#define _RB_ROCCIBOARD_H_
 
 #include "rbsensor.h"
 #include "rbmotor.h"

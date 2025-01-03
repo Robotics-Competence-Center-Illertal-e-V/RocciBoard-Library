@@ -185,6 +185,27 @@ Der Farb-Reflexions-Sensor wird als Objekt mit `RBColor color(1)` eingebunden, w
     }
 ```
 
+#### Infrarot-Seeker (TSOP-IR-Receiver)
+
+> Mithilfe von TSOP-IR-Receivern lassen sich Signale aus gepulster Infrarotstrahlung detektieren. Diese Sensoren werden üblicherweise bei Fernbedienungen verwendet. In der Robotik spielen sie als IR-Seeker in Roboterfußball bei der Erkennung von aktiven Bällen eine große Rolle. Diese strahlen gepulste Infrarotstrahlung aus, mithilfe der Sensoren kann diese Stahlung detektiert und so die Position und Distanz des Balles relativ zum Roboter bestimmt werden.
+
+**Die Infrarot-Seeker verwenden nicht das übliche RBSensor-Interface und müssen daher vor der ersten Verwendung mit der eigenen Funktion `init()` initialisiert werden!**
+
+Alle IR-Seeker werden in einem gemeinsamen Objekt mit `RBInfrared infrared(50, 51, 52, 53)` eingebunden, wobei der Name des Objektes `infrared` frei wählbar ist. In den Konstruktorparametern werden alle zu verwendenden Interrupt-Pins aufgezählt. Die Reihenfolge der Pins im Konstruktor legt den Index des Sensors fest, mit welchem später der Wert ausgelesen werden kann. Im Beispiel sind dies die Pins `50` (Index 0), `51` (Index 1), `52` (Index 2) und `53` (Index 3).    
+Zur Verfügung stehen die Pins `14`, `15`, `16`, `17`, `18`, `19`, `20`, `21`, `22`, `46`, `47` ,`48`, `49`, `50`, `51`, `52` und `53`. Es können somit maximal 17 Infrarotsensoren gleichzeitig mit dem RocciBoard verwendet werden.
+
+* `[int] getValue(int index)` - Gibt die aktuellen Sensorwert des IR-Sensors mit dem Index `index` zurück.
+
+```cpp
+    RBInfrared infrared(50, 51, 52, 53);
+    void setup() {
+        infrared.init();
+    }
+    void loop() {
+        int front_value = infrared.getValue(0);
+    }
+```
+
 ---
 
 ## Nicht-standardisierte Sensoren

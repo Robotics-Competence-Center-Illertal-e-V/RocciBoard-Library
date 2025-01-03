@@ -7,8 +7,8 @@
  * @version 1.0 [09-2023] First stable release
 */
 
-#ifndef rbcompass_h
-#define rbcompass_h
+#ifndef _RB_COMPASS_H_
+#define _RB_COMPASS_H_
 
 #include "rbsensor.h"
 
@@ -34,67 +34,67 @@ class RBCompass : public RBSensor {
         /**
          * Initializes the BNO055 compass sensor
         */    
-        virtual bool init (void);
+        virtual bool init(void);
 
         /**
          * heading describes the angle of the robot in the horizontal plane 
          * @return int16_t : Heading angle (0° -> 365°)
          */
-        int16_t getHeading (void);
+        int16_t getHeading(void);
 
         /**
          * Pitch describes the angle of the robot pointing up or down
          * @return int16_t : Pitch angle (-180° -> 180)
          */
-        int16_t getPitch (void);
+        int16_t getPitch(void);
 
         /**
          * Roll describes the angle of the robot rolling left and right
          * @return int16_t : Roll angle (-180° -> 180)
          */
-        int16_t getRoll (void);
+        int16_t getRoll(void);
 
         /**
          * Returns the ambient temperature of the compass sensor
          * @return int8_t : temperature in °C
          */
-        int8_t getTemperatureCelsius (void);
+        int8_t getTemperatureCelsius(void);
 
         /**
          * Returns the orientation-vector of the robot
          * @return RBVector : x,y,z-compontens of the orientation euler-angle
          */
-        RBVector getVecOrientation (void);
+        RBVector getVecOrientation(void);
 
         /**
          * Returns the acceleration of the robot including gravity 
          * @return RBVector : x,y,z-compontens of the accelaration in m/s²
          */
-        RBVector getVecAccelerometer (void);
+        RBVector getVecAccelerometer(void);
 
         /**
          * Returns the acceleration of the robot excluding gravity 
          * @return RBVector : x,y,z-compontens of the accelaration in m/s²
          */
-        RBVector getVecLinearAcceleration (void);
+        RBVector getVecLinearAcceleration(void);
 
         /**
          * Returns the angular-velocity-vector of the Robot
          * @return RBVector : x,y,z-compontens of the angular velocity in rad/s
          */
-        RBVector getVecGyroscope (void);
+        RBVector getVecGyroscope(void);
 
         /**
          * Returns the magnetic-field-vector measured by the compass sensor
          * @return RBVector : x,y,z-compontens of the magnetic field in uT (micro-tesla)
          */
-        RBVector getVecMagneticField (void);
+        RBVector getVecMagneticField(void);
         
         /**
          * Returns the gravitaional acceleration of the robot
          * @return RBVector : x,y,z-compontens of the accelaration in m/s²
          */
-        RBVector getVecGravity (void);
+        RBVector getVecGravity(void);
 
     private:
         /**

@@ -7,8 +7,8 @@
  * @version 1.0 [09-2023] First stable release
  */
 
-#ifndef rbsensor_h
-#define rbsensor_h
+#ifndef _RB_SENSOR_H_
+#define _RB_SENSOR_H_
 
 #include "Arduino.h"
 #include "Wire.h"

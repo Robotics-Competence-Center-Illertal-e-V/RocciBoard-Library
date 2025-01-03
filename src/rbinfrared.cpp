@@ -1,6 +1,9 @@
+/**
+ * @file rbinfrared.cpp
+ */
+
 #include "Arduino.h"
 #include "rbinfrared.h"
-
 
 #define PIN_HANDLER(pin) \
 void pin_handler_##pin (void) \
@@ -27,7 +30,6 @@ PIN_HANDLER (50)
 PIN_HANDLER (51)
 PIN_HANDLER (52)
 PIN_HANDLER (53)
-
 
 const int g_pin_list[] = { 
     14, 

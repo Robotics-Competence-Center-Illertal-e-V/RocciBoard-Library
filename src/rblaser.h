@@ -7,8 +7,8 @@
  * @version 1.0 [09-2023] First stable release
  */
 
-#ifndef rblaser_h
-#define rblaser_h
+#ifndef _RB_LASER_H_
+#define _RB_LASER_H_
 
 #include "rbsensor.h"
 

@@ -7,8 +7,8 @@
  * @version 1.0 [09-2023] First stable release
  */
 
-#ifndef rbcolor_h
-#define rbcolor_h
+#ifndef _RB_COLOR_H_
+#define _RB_COLOR_H_
 
 #include "rbsensor.h"
 
