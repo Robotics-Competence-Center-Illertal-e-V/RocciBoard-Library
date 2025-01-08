@@ -11,7 +11,7 @@ void pin_handler_##pin (void) \
   RBInfrared::handleInterrupt(pin); \
 }
 
-#define G_MAX_NUMBER_OF_IR_SENSORS 17
+#define G_MAX_NUMBER_OF_IR_SENSORS 35
 
 PIN_HANDLER (14)
 PIN_HANDLER (15)
@@ -30,6 +30,22 @@ PIN_HANDLER (50)
 PIN_HANDLER (51)
 PIN_HANDLER (52)
 PIN_HANDLER (53)
+PIN_HANDLER (54)
+PIN_HANDLER (55)
+PIN_HANDLER (56)
+PIN_HANDLER (57)
+PIN_HANDLER (58)
+PIN_HANDLER (59)
+PIN_HANDLER (60)
+PIN_HANDLER (61)
+PIN_HANDLER (62)
+PIN_HANDLER (63)
+PIN_HANDLER (64)
+PIN_HANDLER (65)
+PIN_HANDLER (66)
+PIN_HANDLER (67)
+PIN_HANDLER (68)
+PIN_HANDLER (69)
 
 const int g_pin_list[] = { 
     14, 
@@ -48,7 +64,23 @@ const int g_pin_list[] = {
     50,
     51,
     52,
-    53
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69
 };
 
 void (* const g_pin_handler_table[])(void)  = {
@@ -69,6 +101,22 @@ void (* const g_pin_handler_table[])(void)  = {
     pin_handler_51,
     pin_handler_52,
     pin_handler_53,
+    pin_handler_54,
+    pin_handler_55,
+    pin_handler_56,
+    pin_handler_57,
+    pin_handler_58,
+    pin_handler_59,
+    pin_handler_60,
+    pin_handler_61,
+    pin_handler_62,
+    pin_handler_63,
+    pin_handler_64,
+    pin_handler_65,
+    pin_handler_66,
+    pin_handler_67,
+    pin_handler_68,
+    pin_handler_69
 };
 
 int RBInfrared::_pin_list[MAX_NUMBER_OF_IR_SENSORS];
@@ -135,7 +183,7 @@ void RBInfrared::handleInterrupt(int pin)
    {
         _values[index] = micros() - _timestamps[index];
         if(_values[index] > 1000)
-            _values[index] = 1000;
+            _values[index] = 0;
    }
 }
 
