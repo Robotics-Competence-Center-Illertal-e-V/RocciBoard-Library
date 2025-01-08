@@ -26,13 +26,13 @@ class RBSonar : public RBSensor
          * Creates the RBSonar-object.
          * @param sensor_port port of the sensor
          */
-        RBSonar(int8_t sensor_port);
+        RBSonar(int8_t sensor_port, uint8_t addr = 0);
 
         /**
          * Creates the RBSonar-object.
          * @param i2c_wire wire-object of the I²C-bus to use
          */
-        RBSonar(TwoWire &i2c_wire);
+        RBSonar(TwoWire &i2c_wire, uint8_t addr = 0);
 
         /**
          * Initializes the SRF08 sensor

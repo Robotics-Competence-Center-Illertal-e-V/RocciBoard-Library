@@ -29,6 +29,7 @@
 #include "rblaser.h"
 #include "rbcolor.h"
 #include "rbinfrared.h"
+#include "rbsonar.h"
 
 #define RB_DEBUG_LED 13
 #define RB_BATTERY_ADC A0

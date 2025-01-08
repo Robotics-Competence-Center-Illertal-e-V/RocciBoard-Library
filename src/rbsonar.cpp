@@ -15,11 +15,11 @@
 #define LOCATION_REGISTER 0x8C
 
 
-RBSonar::RBSonar (int8_t sensor_port, uint8_t addr = 0) : RBSensor(sensor_port), srf08_(MAIN_08_ADDRESS+addr, GAIN_REGISTER, LOCATION_REGISTER)
+RBSonar::RBSonar (int8_t sensor_port, uint8_t addr) : RBSensor(sensor_port), srf08_(MAIN_08_ADDRESS+addr, GAIN_REGISTER, LOCATION_REGISTER)
 {
 }
 
-RBSonar::RBSonar (TwoWire &i2c_wire, uint8_t addr = 0) : RBSensor(i2c_wire), srf08_(MAIN_08_ADDRESS+addr, GAIN_REGISTER, LOCATION_REGISTER)
+RBSonar::RBSonar (TwoWire &i2c_wire, uint8_t addr) : RBSensor(i2c_wire), srf08_(MAIN_08_ADDRESS+addr, GAIN_REGISTER, LOCATION_REGISTER)
 {
 }
 
@@ -36,7 +36,7 @@ float RBSonar::getDistanceCentimeters(void)
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
     float measurement = (float)srf08_.readRange('c');
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
-    return measurement
+    return measurement;
 }
 
 void RBSonar::writeAddress(uint8_t addr)
