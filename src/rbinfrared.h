@@ -80,6 +80,8 @@ class RBInfrared{
          */
         static void handleInterrupt(int pin);
 
+        void reset(void);
+
     private:
 
         static int _pin_list[MAX_NUMBER_OF_IR_SENSORS];

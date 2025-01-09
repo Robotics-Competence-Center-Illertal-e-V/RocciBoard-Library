@@ -193,3 +193,19 @@ int RBInfrared::getValue(int index)
     _values[index] = 0;
     return tmp;
 }
+
+void RBInfrared::reset(void)
+{
+    for(int i = 0; i < MAX_NUMBER_OF_IR_SENSORS; i++)
+    {
+        if(_pin_list[i] != NOT_CONNECTED)
+        {
+            _values[i] = 0;
+            _timestamps[i] = 0;
+        }
+        else
+        {
+            return;
+        }
+    }    
+}
