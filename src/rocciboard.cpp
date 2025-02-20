@@ -20,6 +20,16 @@ void RocciBoard::init (void)
     digitalWrite(RB_DEBUG_LED, LOW);
     // Initializing the voltage-reading ADC
     pinMode(RB_BATTERY_ADC, INPUT);
+    // Changing motor PWM frequency
+    #if defined(ARDUINO_ARCH_AVR)
+        // Arduino Mega: set PWM frequency to 31372.55 Hz
+        TCCR1B = (TCCR1B & B11111000) | B00000001;
+        TCCR2B = (TCCR2B & B11111000) | B00000001;
+        TCCR3B = (TCCR3B & B11111000) | B00000001;
+        TCCR4B = (TCCR4B & B11111000) | B00000001;
+    #elif defined(ARDUINO_ARCH_SAM)
+        // Arduino Due
+    #endif
     // Initializing Motor Drivers
     motor[0].init();
     motor[1].init();
@@ -65,11 +75,14 @@ void RocciBoard::initRBSensor (RBSensor &sensor)
 float RocciBoard::getBatteryVoltage (void)
 {
     #if defined(ARDUINO_ARCH_AVR)
+        // Arduino Mega
         return 0.2805f + 0.0191f * (float)analogRead(RB_BATTERY_ADC);
     #elif defined(ARDUINO_ARCH_SAM)
+        // Arduino Due
         #warning "RocciBoard::getBatteryVoltage() is not available on Arduino ARM Boards"
         return 0.0f;
     #else
+        // other boards
         #warning "RocciBoard::getBatteryVoltage() is not available on this Board"
         return 0.0f;
     #endif
