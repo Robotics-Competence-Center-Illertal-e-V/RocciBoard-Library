@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include "rocciboard.h"
 
-RocciBoard::RocciBoard (void)
+RocciBoard::RocciBoard (uint8_t addr) : tca_(addr)
 {
     motor[0] = RBMotor(5,6);
     motor[1] = RBMotor(7,8);
