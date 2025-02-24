@@ -12,8 +12,6 @@
 
 #include "rbsensor.h"
 
-#include <SonarSRF08.h>
-
 /**
  * Class for implementing the SRF08 sensors for easy usage.
  */
@@ -26,13 +24,13 @@ class RBSonar : public RBSensor
          * Creates the RBSonar-object.
          * @param sensor_port port of the sensor
          */
-        RBSonar(int8_t sensor_port, uint8_t addr = 0);
+        RBSonar(int8_t sensor_port, uint8_t addr = 0x70);
 
         /**
          * Creates the RBSonar-object.
          * @param i2c_wire wire-object of the I²C-bus to use
          */
-        RBSonar(TwoWire &i2c_wire, uint8_t addr = 0);
+        RBSonar(TwoWire &i2c_wire, uint8_t addr = 0x70);
 
         /**
          * Initializes the SRF08 sensor
@@ -40,10 +38,11 @@ class RBSonar : public RBSensor
         virtual bool init(void);
 
         /**
-         * Reads the current distance that the sonar-sensor measures
-         * @return uint16_t: distance in centimeters
+         * Reads the current distance that the sonar-sensor. Note that this blocks for ca. 100 ms. 
+         * Use startMeasurement and readResultInCentimeters to use the time for other processing
+         * @return int: distance in centimeters
          */
-        float getDistanceCentimeters(void);
+        int getDistanceCentimeters(void);
         
         /**
          * writes a new i2c address to the sonar sensor
@@ -51,8 +50,40 @@ class RBSonar : public RBSensor
          */
         void writeAddress(uint8_t addr);
 
+
+        /**
+         * start a measurement. The result needs to be read with readResultInCentimeters when resultReady is true
+         */
+        void startMeasurement();
+
+        /**
+         * @brief check if the result of startMeasurement is readable
+         * 
+         * @return true 
+         * @return false 
+         */
+        bool resultReady();
+
+        /**
+         * @brief return the result in centimeters
+         * 
+         * @return int 
+         */
+        int readResultInCentimeters();
+
     private:
-        SonarSRF08 srf08_;
+        /**
+         * @brief helper to send commands to srf08
+         * 
+         * @param cmd 
+         */
+        void command(uint8_t cmd);
+        
+        /**
+         * @brief address of the srf08 sensor
+         * 
+         */
+        int _srf_address;
 };
 
 #endif

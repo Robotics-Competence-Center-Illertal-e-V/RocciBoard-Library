@@ -44,8 +44,9 @@ class RocciBoard {
   public:
     /**
      * Creates the RocciBoard-Object
+     * @param addr is the I2C multiplexer address
     */
-    RocciBoard (void);
+    RocciBoard (uint8_t addr=0x70);
 
     /**
      * Initializes the RocciBoard
