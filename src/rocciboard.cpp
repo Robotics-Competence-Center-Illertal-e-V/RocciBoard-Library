@@ -34,6 +34,8 @@ void RocciBoard::init (void)
     motor[2].init();
     motor[3].init();
     // Initializing I2C-Multiplexer
+    Wire.begin();
+    Wire.setWireTimeout();
     pinMode(RB_MUX_RESET, INPUT_PULLUP);
     tca_.begin(Wire);
     tca_.closeAll();
