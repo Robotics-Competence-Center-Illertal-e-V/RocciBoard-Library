@@ -18,14 +18,12 @@
 #define MICROSECONDS      0x52
 
 
-RBSonar::RBSonar (int8_t sensor_port, uint8_t addr) : RBSensor(sensor_port) 
+RBSonar::RBSonar (int8_t sensor_port, uint8_t addr) : RBSensor(sensor_port, addr) 
 {
-    _srf_address = addr;
 }
 
-RBSonar::RBSonar (TwoWire &i2c_wire, uint8_t addr) : RBSensor(i2c_wire)
+RBSonar::RBSonar (TwoWire &i2c_wire, uint8_t addr) : RBSensor(i2c_wire, addr)
 {
-    _srf_address = addr;
 }
 
 bool RBSonar::init(void)
@@ -89,10 +87,10 @@ bool RBSonar::resultReady()
 int RBSonar::readResultInCentimeters()
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
-    Wire.beginTransmission(_srf_address);
+    Wire.beginTransmission(sensor_i2c_address_);
     Wire.write(RANGE_REGISTER);
     Wire.endTransmission();
-    Wire.requestFrom(_srf_address, 2);
+    Wire.requestFrom(sensor_i2c_address_, 2);
     if (Wire.available() >= 2) {
         int highByte = Wire.read();
         int lowByte = Wire.read();
@@ -105,7 +103,7 @@ int RBSonar::readResultInCentimeters()
 
 void RBSonar::command(uint8_t cmd)
 {
-    Wire.beginTransmission(_srf_address);
+    Wire.beginTransmission(sensor_i2c_address_);
     Wire.write(COMMAND_REGISTER);
     Wire.write(cmd);
     Wire.endTransmission();

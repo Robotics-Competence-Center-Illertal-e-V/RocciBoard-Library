@@ -4,12 +4,14 @@
 
 #include "rblaser.h"
 
-RBLaser::RBLaser (int8_t sensor_port, bool is_long_range) : RBSensor(sensor_port)
+#define ADDRESS_DEFAULT 0b0101001 // same for VL53L0X and VL53L1X 
+
+RBLaser::RBLaser (int8_t sensor_port, bool is_long_range) : RBSensor(sensor_port, ADDRESS_DEFAULT)
 {
     long_range_ = is_long_range;
 }
 
-RBLaser::RBLaser (TwoWire &i2c_wire, bool is_long_range) : RBSensor(i2c_wire)
+RBLaser::RBLaser (TwoWire &i2c_wire, bool is_long_range) : RBSensor(i2c_wire, ADDRESS_DEFAULT)
 {
     long_range_ = is_long_range;
 }

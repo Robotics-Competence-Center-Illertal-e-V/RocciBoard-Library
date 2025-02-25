@@ -4,6 +4,16 @@
 
 #include "rbcolor.h"
 
+#define ADDRESS_DEFAULT 0x29
+
+RBColor::RBColor (int8_t sensor_port) : RBSensor(sensor_port, ADDRESS_DEFAULT)
+{
+}
+
+RBColor::RBColor (TwoWire &i2c_wire) : RBSensor(i2c_wire, ADDRESS_DEFAULT)
+{
+}
+
 bool RBColor::init(void)
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);

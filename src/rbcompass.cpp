@@ -4,6 +4,16 @@
 
 #include "rbcompass.h"
 
+#define ADDRESS_DEFAULT 0b0101001
+
+RBCompass::RBCompass (int8_t sensor_port) : RBSensor(sensor_port, ADDRESS_DEFAULT)
+{
+}
+
+RBCompass::RBCompass (TwoWire &i2c_wire) : RBSensor(i2c_wire, ADDRESS_DEFAULT)
+{
+}
+
 bool RBCompass::init(void)
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);

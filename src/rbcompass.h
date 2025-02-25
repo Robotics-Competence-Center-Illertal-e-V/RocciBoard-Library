@@ -29,8 +29,8 @@ typedef struct {
 class RBCompass : public RBSensor {
 
     public:
-        using RBSensor::RBSensor;
-
+        RBCompass (int8_t sensor_port);
+        RBCompass (TwoWire &i2c_wire);
         /**
          * Initializes the BNO055 compass sensor
         */    
