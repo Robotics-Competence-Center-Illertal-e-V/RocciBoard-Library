@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include "rocciboard.h"
 
-RocciBoard::RocciBoard (void)
+RocciBoard::RocciBoard (uint8_t addr) : tca_(addr)
 {
     motor[0] = RBMotor(5,6);
     motor[1] = RBMotor(7,8);
@@ -21,7 +21,7 @@ void RocciBoard::init (void)
     // Initializing the voltage-reading ADC
     pinMode(RB_BATTERY_ADC, INPUT);
     // Changing motor PWM frequency
-    #if defined(__AVR__)
+    #if defined(__AVR_ATmega2560__)
         // Arduino Mega: set PWM frequency to 31372.55 Hz
         TCCR1B = (TCCR1B & B11111000) | B00000001;
         TCCR2B = (TCCR2B & B11111000) | B00000001;

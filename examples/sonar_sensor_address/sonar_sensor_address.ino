@@ -13,7 +13,8 @@
 #include "rocciboard.h"
 
 //Ultraschall an Rocciboard Port 0
-RBSonar sonar(0);
+RBSonar sonar_alt(0, 0x70);
+RBSonar sonar_neu(0, 0x71);
 
 // der Multiplexer muss auf einer anderen Addresse konfiguriert werden wie die SRF08 (default = 0x70). 
 // Dazu müssen die Lötbrücken A0,A1 und A2 auf VDD für zB 0x77
@@ -22,11 +23,13 @@ RocciBoard rb(0x77);
 void setup() {
   Serial.begin(9600);
   rb.init();
-  rb.initRBSensor(sonar);
+  rb.initRBSensor(sonar_alt);
+  rb.initRBSensor(sonar_neu);
+  sonar_alt.writeAddress(0x71);
 }
 
 void loop() {
-    int distance = sonar.getDistanceCentimeters();
+    int distance = sonar_neu.getDistanceCentimeters();
     Serial.print("Entfernung: ");
     Serial.print(distance);
     Serial.println(" cm");
