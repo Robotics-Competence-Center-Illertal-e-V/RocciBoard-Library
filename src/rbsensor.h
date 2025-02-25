@@ -34,8 +34,9 @@ class RBSensor
          * Creates the RBSensor-Object for a Multiplexer setup.
          * @param sensor_port port of the sensor
          */
-        RBSensor(int8_t sensor_port)
+        RBSensor(int8_t sensor_port, uint8_t sensor_i2c_address)
         {
+            sensor_i2c_address_ = sensor_i2c_address;
             sensor_port_ = sensor_port;
             wire_ = &Wire;
         }
@@ -48,6 +49,19 @@ class RBSensor
         {
             sensor_port_ = RB_NO_MULTIPLEXER;
             wire_ = &i2c_wire;
+        }
+
+        bool isConnected()
+        {
+            if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+            wire_.beginTransmission(sensor_i2c_address_);
+            int error = wire_.endTransmission();
+            if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+
+            if(error == 0)
+                return true;
+            else
+                return false;
         }
 
         /**
@@ -88,6 +102,7 @@ class RBSensor
 
     protected:
         int8_t sensor_port_;
+        uint8_t sensor_i2c_address_;
         TCA9548A* tca_;
         TwoWire* wire_;
 
