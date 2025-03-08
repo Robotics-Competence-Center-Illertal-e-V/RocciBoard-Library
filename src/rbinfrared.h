@@ -42,7 +42,23 @@ class RBInfrared{
             int s12=NOT_CONNECTED,
             int s13=NOT_CONNECTED,
             int s14=NOT_CONNECTED,
-            int s15=NOT_CONNECTED)
+            int s15=NOT_CONNECTED,
+            int s16=NOT_CONNECTED,
+            int s17=NOT_CONNECTED,
+            int s18=NOT_CONNECTED,
+            int s19=NOT_CONNECTED,
+            int s20=NOT_CONNECTED,
+            int s21=NOT_CONNECTED,
+            int s22=NOT_CONNECTED,
+            int s23=NOT_CONNECTED,
+            int s24=NOT_CONNECTED,
+            int s25=NOT_CONNECTED,
+            int s26=NOT_CONNECTED,
+            int s27=NOT_CONNECTED,
+            int s28=NOT_CONNECTED,
+            int s29=NOT_CONNECTED,
+            int s30=NOT_CONNECTED,
+            int s31=NOT_CONNECTED)
             {
                 RBInfrared::_pin_list[0] = s0;
                 RBInfrared::_pin_list[1] = s1;
@@ -60,6 +76,22 @@ class RBInfrared{
                 RBInfrared::_pin_list[13] = s13;
                 RBInfrared::_pin_list[14] = s14;
                 RBInfrared::_pin_list[15] = s15;
+                RBInfrared::_pin_list[16] = s16;
+                RBInfrared::_pin_list[17] = s17;
+                RBInfrared::_pin_list[18] = s18;
+                RBInfrared::_pin_list[19] = s19;
+                RBInfrared::_pin_list[20] = s20;
+                RBInfrared::_pin_list[21] = s21;
+                RBInfrared::_pin_list[22] = s22;
+                RBInfrared::_pin_list[23] = s23;
+                RBInfrared::_pin_list[24] = s24;
+                RBInfrared::_pin_list[25] = s25;
+                RBInfrared::_pin_list[26] = s26;
+                RBInfrared::_pin_list[27] = s27;
+                RBInfrared::_pin_list[28] = s28;
+                RBInfrared::_pin_list[29] = s29;
+                RBInfrared::_pin_list[30] = s30;
+                RBInfrared::_pin_list[31] = s31;
             };
 
          /**

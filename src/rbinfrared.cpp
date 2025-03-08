@@ -11,7 +11,7 @@ void pin_handler_##pin (void) \
   RBInfrared::handleInterrupt(pin); \
 }
 
-#define G_MAX_NUMBER_OF_IR_SENSORS 35
+#define G_MAX_NUMBER_OF_IR_SENSORS 57
 
 PIN_HANDLER (14)
 PIN_HANDLER (15)
@@ -22,6 +22,29 @@ PIN_HANDLER (19)
 PIN_HANDLER (20)
 PIN_HANDLER (21)
 PIN_HANDLER (22)
+PIN_HANDLER (23)
+PIN_HANDLER (24)
+PIN_HANDLER (25)
+PIN_HANDLER (26)
+PIN_HANDLER (27)
+PIN_HANDLER (28)
+PIN_HANDLER (29)
+PIN_HANDLER (30)
+PIN_HANDLER (31)
+PIN_HANDLER (32)
+PIN_HANDLER (33)
+PIN_HANDLER (34)
+PIN_HANDLER (35)
+PIN_HANDLER (36)
+PIN_HANDLER (37)
+PIN_HANDLER (38)
+PIN_HANDLER (39)
+PIN_HANDLER (40)
+PIN_HANDLER (41)
+PIN_HANDLER (42)
+PIN_HANDLER (43)
+PIN_HANDLER (44)
+PIN_HANDLER (45)
 PIN_HANDLER (46)
 PIN_HANDLER (47)
 PIN_HANDLER (48)
@@ -57,6 +80,29 @@ const int g_pin_list[] = {
     20,
     21,
     22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
     46,
     47,
     48,
@@ -93,6 +139,29 @@ void (* const g_pin_handler_table[])(void)  = {
     pin_handler_20,
     pin_handler_21,
     pin_handler_22,
+    pin_handler_23,
+    pin_handler_24,
+    pin_handler_25,
+    pin_handler_26,
+    pin_handler_27,
+    pin_handler_28,
+    pin_handler_29,
+    pin_handler_30,
+    pin_handler_31,
+    pin_handler_32,
+    pin_handler_33,
+    pin_handler_34,
+    pin_handler_35,
+    pin_handler_36,
+    pin_handler_37,
+    pin_handler_38,
+    pin_handler_39,
+    pin_handler_40,
+    pin_handler_41,
+    pin_handler_42,
+    pin_handler_43,
+    pin_handler_44,
+    pin_handler_45,
     pin_handler_46,
     pin_handler_47,
     pin_handler_48,
