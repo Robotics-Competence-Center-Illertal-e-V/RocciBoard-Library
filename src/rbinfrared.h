@@ -11,7 +11,7 @@
 #ifndef _RB_INFRARED_H_
 #define _RB_INFRARED_H_
 
-#define MAX_NUMBER_OF_IR_SENSORS 16
+#define MAX_NUMBER_OF_IR_SENSORS 32
 #define NOT_CONNECTED -1
 
 /**
