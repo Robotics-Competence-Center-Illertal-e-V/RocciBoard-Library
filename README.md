@@ -5,10 +5,10 @@
 
 Das RocciBoard Arduino Shield des [Robotics Competence Center Illertal e. V.](https://rocci.net) ist eine Erweiterung des Arduino Mega bzw. Arduino Giga, die grundlegende Funktionen eines Roboters bereitstellt und eine Basis für eigene Ideen und Erweiterungen bietet. Die zugehörige Bibliothek wurde ebenfalls vom Arbeitskreis Entwicklung speziell für die Verwendung zu Unterrichtszwecken entwickelt. Sie bietet ein einfaches, intuitives und erweiterbares Framework für die Verwendung von Funktionen des Boards, von Motoren und Sensoren. Die Bibliothek ist nicht allzu umfangreich gehalten, um den Kursteilnehmern zwar die Programmierung des Arduinos realitätsnah zu vermitteln, komplexere Funktionen wie die Verwendung der Sensoren aber zu vereinfachen.
 
-Die RocciBoard-Bibliothek enthält **zahlreiche Beispielprogramme**, welche die Verwendung und Ansteuerung von Sensoren und Motoren demonstrieren. Ebenfalls verfügbar ist eine **RocciBoard-Projektvorlage** (*template.ino*), welche als vorstrukturierte, leere Vorlage verwendet werden kann. Sie beinhaltet bereits die wichtigsten Deklarationen und Anweisungen.
-
 > [!TIP]
->  In der folgenden Dokumentation werden alle Funktionen ausgiebig erläutert und beschrieben.
+> Die RocciBoard-Bibliothek enthält **zahlreiche Beispielprogramme**, welche die Verwendung und Ansteuerung von Sensoren und Motoren demonstrieren. Ebenfalls verfügbar ist eine **RocciBoard-Projektvorlage** (*template.ino*), welche als vorstrukturierte, leere Vorlage verwendet werden kann. Sie beinhaltet bereits die wichtigsten Deklarationen und Anweisungen.
+
+**In der folgenden Dokumentation werden alle Funktionen ausgiebig erläutert und beschrieben:**
 
 ---
 
@@ -194,8 +194,8 @@ Der Farb-Reflexions-Sensor wird als Objekt mit `RBColor color(1)` eingebunden, w
 > Die Infrarot-Seeker verwenden nicht das übliche RBSensor-Interface und müssen daher vor der ersten Verwendung mit der eigenen Funktion `init()` initialisiert werden!
 
 
-Alle IR-Seeker werden in einem gemeinsamen Objekt mit `RBInfrared infrared(50, 51, 52, 53)` eingebunden, wobei der Name des Objektes `infrared` frei wählbar ist. In den Konstruktorparametern werden alle zu verwendenden Interrupt-Pins aufgezählt. Die Reihenfolge der Pins im Konstruktor legt den Index des Sensors fest, mit welchem später der Wert ausgelesen werden kann. Im Beispiel sind dies die Pins `50` (Index 0), `51` (Index 1), `52` (Index 2) und `53` (Index 3). 
-Zur Verfügung stehen die Pins **15-69**. Es können somit maximal 56 Infrarotsensoren gleichzeitig mit dem RocciBoard verwendet werden.
+Alle IR-Seeker werden in einem gemeinsamen Objekt mit `RBInfrared infrared(50, 51, 52, 53)` eingebunden, wobei der Name des Objektes `infrared` frei wählbar ist. In den Konstruktorparametern werden alle zu verwendenden Interrupt-Pins aufgezählt. Die Reihenfolge der Pins im Konstruktor legt den Index des Sensors fest, mit welchem später der Wert ausgelesen werden kann. Im Beispiel sind dies die Pins `50` (Index 0), `51` (Index 1), `52` (Index 2) und `53` (Index 3).   
+Zur Verfügung stehen die **Pins 15-69**. Es können somit maximal 56 Infrarotsensoren gleichzeitig mit dem RocciBoard verwendet werden.
 
 * `[int] getValue(int index)` - Gibt die aktuellen Sensorwert des IR-Sensors mit dem Index `index` zurück.
 
