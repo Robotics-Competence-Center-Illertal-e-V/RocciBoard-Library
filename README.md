@@ -7,7 +7,8 @@ Das RocciBoard Arduino Shield des [Robotics Competence Center Illertal e. V.](ht
 
 Die RocciBoard-Bibliothek enthält **zahlreiche Beispielprogramme**, welche die Verwendung und Ansteuerung von Sensoren und Motoren demonstrieren. Ebenfalls verfügbar ist eine **RocciBoard-Projektvorlage** (*template.ino*), welche als vorstrukturierte, leere Vorlage verwendet werden kann. Sie beinhaltet bereits die wichtigsten Deklarationen und Anweisungen.
 
-> In der folgenden Dokumentation werden alle Funktionen ausgiebig erläutert und beschrieben.
+> [!TIP]
+>  In der folgenden Dokumentation werden alle Funktionen ausgiebig erläutert und beschrieben.
 
 ---
 
@@ -189,10 +190,12 @@ Der Farb-Reflexions-Sensor wird als Objekt mit `RBColor color(1)` eingebunden, w
 
 > Mithilfe von TSOP-IR-Receivern lassen sich Signale aus gepulster Infrarotstrahlung detektieren. Diese Sensoren werden üblicherweise bei Fernbedienungen verwendet. In der Robotik spielen sie als IR-Seeker in Roboterfußball bei der Erkennung von aktiven Bällen eine große Rolle. Diese strahlen gepulste Infrarotstrahlung aus, mithilfe der Sensoren kann diese Stahlung detektiert und so die Position und Distanz des Balles relativ zum Roboter bestimmt werden.
 
-**Die Infrarot-Seeker verwenden nicht das übliche RBSensor-Interface und müssen daher vor der ersten Verwendung mit der eigenen Funktion `init()` initialisiert werden!**
+> [!IMPORTANT]
+> Die Infrarot-Seeker verwenden nicht das übliche RBSensor-Interface und müssen daher vor der ersten Verwendung mit der eigenen Funktion `init()` initialisiert werden!
 
-Alle IR-Seeker werden in einem gemeinsamen Objekt mit `RBInfrared infrared(50, 51, 52, 53)` eingebunden, wobei der Name des Objektes `infrared` frei wählbar ist. In den Konstruktorparametern werden alle zu verwendenden Interrupt-Pins aufgezählt. Die Reihenfolge der Pins im Konstruktor legt den Index des Sensors fest, mit welchem später der Wert ausgelesen werden kann. Im Beispiel sind dies die Pins `50` (Index 0), `51` (Index 1), `52` (Index 2) und `53` (Index 3).    
-Zur Verfügung stehen die Pins `14`, `15`, `16`, `17`, `18`, `19`, `20`, `21`, `22`, `46`, `47` ,`48`, `49`, `50`, `51`, `52` und `53`. Es können somit maximal 17 Infrarotsensoren gleichzeitig mit dem RocciBoard verwendet werden.
+
+Alle IR-Seeker werden in einem gemeinsamen Objekt mit `RBInfrared infrared(50, 51, 52, 53)` eingebunden, wobei der Name des Objektes `infrared` frei wählbar ist. In den Konstruktorparametern werden alle zu verwendenden Interrupt-Pins aufgezählt. Die Reihenfolge der Pins im Konstruktor legt den Index des Sensors fest, mit welchem später der Wert ausgelesen werden kann. Im Beispiel sind dies die Pins `50` (Index 0), `51` (Index 1), `52` (Index 2) und `53` (Index 3). 
+Zur Verfügung stehen die Pins **15-69**. Es können somit maximal 56 Infrarotsensoren gleichzeitig mit dem RocciBoard verwendet werden.
 
 * `[int] getValue(int index)` - Gibt die aktuellen Sensorwert des IR-Sensors mit dem Index `index` zurück.
 
@@ -232,7 +235,8 @@ Nun kann entweder ein weiterer Kanal geöffnet werden oder mit der Ausführung d
 
 > Die standardisierten Sensoren können auch ohne den Multiplexer direkt an einen I²C-Bus des Arduino angeschlossen werden. Dies ist allerdings nicht empfehlenswert, da Probleme wie Adresskonflikte auftreten können. Deshalb sollte dies nur von fortgeschrittenen Benutzern durchgeführt werden.
 
-**Die Verwendung des Kompass-Sensors wird über dieses Interface aktuell nicht unterstützt!**
+> [!WARNING]
+> Die Verwendung des Kompass-Sensors wird über dieses Interface aktuell nicht unterstützt!
 
 Die RBSensor-Sensoren werden statt mit dem Sensor-Port mit der dem Wire-Objekt des jeweiligen nativem I²C-Busses deklariert, also mit `Wire` für den Standard-I²C, `Wire1` für I²C-1 oder `Wire2`für I²C-2. Hierdurch wird die Multiplexer-Funktionalität der Sensoren deaktiviert und der gewünschte I²C-Bus aktiviert. 
 Die Initialisierung findet wie gewohnt über das RocciBoard mit `rb.initRBSensor(sensor)` statt. Alternativ kann der Sensor auch direkt mit `sensor.init()` initialisiert werden.
