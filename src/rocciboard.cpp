@@ -136,8 +136,9 @@ void RocciBoard::resetMultiplexer (void)
 {
     pinMode(RB_MUX_RESET, OUTPUT);
     digitalWrite(RB_MUX_RESET, LOW);
-    delay(500);
+    delay(1);
     pinMode(RB_MUX_RESET, INPUT_PULLUP);
+    delay(1);
 }
 
 void RocciBoard::initRBSensor (RBSensor &sensor)
