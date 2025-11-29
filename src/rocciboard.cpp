@@ -21,6 +21,13 @@ void RocciBoard::init (void)
     digitalWrite(RB_DEBUG_LED, LOW);
     // Initializing the voltage-reading ADC
     pinMode(RB_BATTERY_ADC, INPUT);
+    float u_bat = getBatteryVoltage();
+    if(u_bat < 6.0)
+    {
+        Serial.println("Batteriespannung "+String(u_bat)+"V. Muss über 6V sein");
+        while(1);
+    }
+
     // Changing motor PWM frequency
     #if defined(__AVR_ATmega2560__)
         // Arduino Mega: set PWM frequency to 31372.55 Hz
