@@ -25,7 +25,11 @@ void RocciBoard::init (void)
     if(u_bat < 6.0)
     {
         Serial.println("Batteriespannung "+String(u_bat)+"V. Muss über 6V sein");
-        while(1);
+        while(1)
+        {
+            blinkDebugLED();
+            delay(1000);
+        }
     }
 
     // Changing motor PWM frequency
@@ -48,6 +52,7 @@ void RocciBoard::init (void)
         while(1)
         {
             blinkDebugLED();
+            delay(1000);
         }
     }
     // Initializing I2C-Multiplexer
