@@ -104,6 +104,11 @@ class RocciBoard {
     */ 
     void blinkDebugLED (void); 
 
+    /**
+     * Scan the i2c ports for connected devices
+     */
+    void scanI2C(void);
+
     RBMotor motor[4];
 
   private:

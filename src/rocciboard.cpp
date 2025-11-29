@@ -100,4 +100,27 @@ void RocciBoard::blinkDebugLED (void)
     digitalWrite(RB_DEBUG_LED, HIGH);
     delay(100);
     digitalWrite(RB_DEBUG_LED, LOW);
+
+void RocciBoard::scanI2C(void)
+{
+    Serial.println("Start I2C Scan");
+    for(int sensor_port = 0; sensor_port < 8; sensor_port++)
+    {
+        openSensorPort(sensor_port); 
+        for(int i2c_addr = 1; i2c_addr < 128; i2c_addr++)
+        {            
+            Wire.beginTransmission(i2c_addr);
+            int error = Wire.endTransmission();
+            if(i2c_addr == tca_addr) //skip multiplexer
+            {
+                continue;
+            }
+            if (error == 0)
+            {
+                Serial.println("Port:"+String(sensor_port)+" Addresse:"+String(i2c_addr));
+            }
+        }
+        closeSensorPort(sensor_port);
+    }
+    Serial.println("Ende");
 }
