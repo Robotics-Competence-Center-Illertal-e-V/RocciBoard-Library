@@ -77,7 +77,23 @@ void RocciBoard::init (void)
     }
 
     tca_.begin(Wire);
-    tca_.closeAll();
+
+    //test multiplexer i2c ports
+    for(int sensor_port = 0; sensor_port < 8; sensor_port++)
+    {
+        openSensorPort(sensor_port); 
+        if( ! testI2CPort() )
+        {
+            Serial.println(" am I2C Port "+String(sensor_port)+". Kabel oder Sensor defekt?");
+            while(1)
+            {
+                blinkDebugLED();
+                delay(1000);
+            }
+        }
+        resetMultiplexer(); // reset instead of close to avoid stuck at
+    }
+
     // Blink debug-LED to signal finished bootup
     blinkDebugLED();
 }
