@@ -51,7 +51,31 @@ void RocciBoard::init (void)
         }
     }
     // Initializing I2C-Multiplexer
-    pinMode(RB_MUX_RESET, INPUT_PULLUP);
+    resetMultiplexer(); // reset to make sure nothing is still open
+    Wire.begin();
+
+    //verify TCA is connected with correct address
+    Wire.beginTransmission(tca_addr);
+    int error = Wire.endTransmission();
+    if(error)
+    {
+        Serial.println("Multiplexer Addresse ist Falsch.");
+        for(int i2c_addr = 112; i2c_addr < 120; i2c_addr++)
+        {            
+            Wire.beginTransmission(i2c_addr);
+            int error = Wire.endTransmission();
+            if (error == 0)
+            {
+                Serial.println("verwende: RocciBoard rb("+String(i2c_addr)+")");
+            }
+        }
+        while(1)
+        {
+            blinkDebugLED();
+            delay(1000);
+        }
+    }
+
     tca_.begin(Wire);
     tca_.closeAll();
     // Blink debug-LED to signal finished bootup
