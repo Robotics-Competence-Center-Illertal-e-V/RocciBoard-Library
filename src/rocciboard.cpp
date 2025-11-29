@@ -41,6 +41,15 @@ void RocciBoard::init (void)
     motor[1].init();
     motor[2].init();
     motor[3].init();
+    // test i2c port
+    if( ! testI2CPort() )
+    {
+        Serial.println(" am Rocciboard I2C. Pin D21 oder D22 belegt?");
+        while(1)
+        {
+            blinkDebugLED();
+        }
+    }
     // Initializing I2C-Multiplexer
     pinMode(RB_MUX_RESET, INPUT_PULLUP);
     tca_.begin(Wire);
@@ -62,6 +71,25 @@ void RocciBoard::closeSensorPort (uint8_t sensor_port)
 void RocciBoard::closeAllSensorPorts (void)
 {
     tca_.closeAll();
+}
+
+bool RocciBoard::testI2CPort(bool with_debug = true)
+{
+    pinMode(RB_I2C_SCL, INPUT);
+    pinMode(RB_I2C_SDA, INPUT);
+    if(digitalRead(RB_I2C_SCL) == 0) 
+    {
+        if(with_debug) Serial.print("SCL Fehler");
+        return false;
+    }
+    if(digitalRead(RB_I2C_SDA) == 0)
+    {
+        if(with_debug) Serial.print("SDA Fehler");
+        return false;
+    } 
+    pinMode(RB_I2C_SCL, OUTPUT);
+    pinMode(RB_I2C_SDA, INPUT);
+    return true;
 }
 
 void RocciBoard::resetMultiplexer (void)

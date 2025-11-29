@@ -34,6 +34,8 @@
 #define RB_DEBUG_LED 13
 #define RB_BATTERY_ADC A0
 #define RB_MUX_RESET 4
+#define RB_I2C_SCL 21
+#define RB_I2C_SDA 20
 
 /**
  * Hardware specific class that implements the functions of the RocciBoard-Shield. \n
@@ -53,6 +55,11 @@ class RocciBoard {
      * @return bool : Initialization successful
     */
     void init (void);
+
+    /**
+     * verifies if SCL or SDA is stuck on GND
+     */
+    bool testI2CPort(bool with_debug = true);
 
     /**
      * Opens a sensor-channel on the I²C-Multiplexer. \n 
