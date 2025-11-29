@@ -108,6 +108,7 @@ class RocciBoard {
 
   private:
     TCA9548A tca_;   
+    uint8_t tca_addr;
 
 };
 

@@ -7,6 +7,7 @@
 
 RocciBoard::RocciBoard (uint8_t addr) : tca_(addr)
 {
+    tca_addr = addr;
     motor[0] = RBMotor(5,6);
     motor[1] = RBMotor(7,8);
     motor[2] = RBMotor(9,10);
