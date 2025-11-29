@@ -176,6 +176,7 @@ void RocciBoard::blinkDebugLED (void)
     digitalWrite(RB_DEBUG_LED, HIGH);
     delay(100);
     digitalWrite(RB_DEBUG_LED, LOW);
+}
 
 void RocciBoard::scanI2C(void)
 {
