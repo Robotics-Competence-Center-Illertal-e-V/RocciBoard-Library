@@ -21,12 +21,18 @@ class RBColor : public RBSensor
 {
 
     public:
-        using RBSensor::RBSensor;
+        static constexpr uint32_t _i2c_address = 0x29;
+        RBColor(int8_t sensor_port) : RBSensor(sensor_port, _i2c_address) {}
 
         /**
-         * Initializes the VL53L0X and VL53L1X compass sensor
+         * Initializes the Color sensor
         */    
         virtual bool init(void);
+
+        /**
+         * returns the name "Color"
+         */
+        virtual String getName(void) { return String("Color"); };
 
         /**
          * Reads the current reflectance-value of the color red

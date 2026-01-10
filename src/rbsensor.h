@@ -31,12 +31,18 @@ class RBSensor
         virtual bool init(void) = 0;
 
         /**
+         * returns the name of the Sensor
+         */
+        virtual String getName(void) = 0;
+
+        /**
          * Creates the RBSensor-Object for a Multiplexer setup.
          * @param sensor_port port of the sensor
          */
-        RBSensor(int8_t sensor_port)
+        RBSensor(int8_t sensor_port, int8_t i2c_address)
         {
             sensor_port_ = sensor_port;
+            i2c_adress_ = i2c_address;
             wire_ = &Wire;
         }
 
@@ -86,8 +92,29 @@ class RBSensor
             return tca_;
         }
 
+        /**
+         * performs ACK check on the i2c adress defined in the constructor.
+         */
+        bool checkForAck(void)
+        {
+            if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+            Wire.beginTransmission(i2c_adress_);
+            int error = Wire.endTransmission();
+            if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+            if (error)
+            {
+                Serial.println("Sensor Fehler an Port: "+String(sensor_port_));
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
     protected:
         int8_t sensor_port_;
+        uint8_t i2c_adress_;
         TCA9548A* tca_;
         TwoWire* wire_;
 

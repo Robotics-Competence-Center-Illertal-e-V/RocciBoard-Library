@@ -118,7 +118,7 @@ void RocciBoard::closeAllSensorPorts (void)
     tca_.closeAll();
 }
 
-bool RocciBoard::testI2CPort(bool with_debug = true)
+bool RocciBoard::testI2CPort(bool with_debug)
 {
     pinMode(RB_I2C_SCL, INPUT);
     pinMode(RB_I2C_SDA, INPUT);
@@ -149,6 +149,10 @@ void RocciBoard::resetMultiplexer (void)
 void RocciBoard::initRBSensor (RBSensor &sensor)
 {
     sensor.setMultiplexer(&tca_);
+    if(! sensor.checkForAck())
+    {
+        Serial.println("Fehler an Port "+String(sensor.getSensorPort()) + " mit " + sensor.getName() + " Sensor");
+    }
     sensor.init();
 }
 
