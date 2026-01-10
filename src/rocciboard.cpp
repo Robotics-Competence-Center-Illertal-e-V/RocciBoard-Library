@@ -118,7 +118,7 @@ void RocciBoard::closeAllSensorPorts (void)
     tca_.closeAll();
 }
 
-bool RocciBoard::testI2CPort(bool with_debug = true)
+bool RocciBoard::testI2CPort(bool with_debug)
 {
     pinMode(RB_I2C_SCL, INPUT);
     pinMode(RB_I2C_SDA, INPUT);
