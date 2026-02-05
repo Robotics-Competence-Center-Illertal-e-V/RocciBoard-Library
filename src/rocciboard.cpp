@@ -22,6 +22,9 @@ void RocciBoard::init (void)
     digitalWrite(RB_DEBUG_LED, LOW);
     // Initializing the voltage-reading ADC
     pinMode(RB_BATTERY_ADC, INPUT);
+
+    
+    #if defined(__AVR_ATmega2560__)
     float u_bat = getBatteryVoltage();
     if(u_bat < 6.0)
     {
@@ -32,6 +35,7 @@ void RocciBoard::init (void)
             delay(1000);
         }
     }
+    #endif
 
     // Changing motor PWM frequency
     #if defined(__AVR_ATmega2560__)
