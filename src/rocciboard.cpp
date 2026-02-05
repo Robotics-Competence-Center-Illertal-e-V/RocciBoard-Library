@@ -16,6 +16,7 @@ RocciBoard::RocciBoard (uint8_t addr) : tca_(addr)
 
 void RocciBoard::init (void)
 {
+    Serial.begin(9600);
     // Initializing Error-LED
     pinMode(RB_DEBUG_LED, OUTPUT);
     digitalWrite(RB_DEBUG_LED, LOW);
