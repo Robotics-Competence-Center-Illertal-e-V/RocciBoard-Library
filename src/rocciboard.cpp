@@ -125,21 +125,24 @@ void RocciBoard::closeAllSensorPorts (void)
 
 bool RocciBoard::testI2CPort(bool with_debug)
 {
+    bool result = true;
+    Wire.end();
     pinMode(RB_I2C_SCL, INPUT);
     pinMode(RB_I2C_SDA, INPUT);
     if(digitalRead(RB_I2C_SCL) == 0) 
     {
         if(with_debug) Serial.print("SCL Fehler");
-        return false;
+        result = false;
     }
     if(digitalRead(RB_I2C_SDA) == 0)
     {
         if(with_debug) Serial.print("SDA Fehler");
-        return false;
+        result = false;
     } 
     pinMode(RB_I2C_SCL, OUTPUT);
     pinMode(RB_I2C_SDA, INPUT);
-    return true;
+    Wire.begin();
+    return result;
 }
 
 void RocciBoard::resetMultiplexer (void)
