@@ -87,6 +87,7 @@ void RocciBoard::init (void)
     }
 
     tca_.begin(Wire);
+    closeAllSensorPorts();
 
     //test multiplexer i2c ports
     for(int sensor_port = 0; sensor_port < 8; sensor_port++)
@@ -103,6 +104,7 @@ void RocciBoard::init (void)
         }
         resetMultiplexer(); // reset instead of close to avoid stuck at
     }
+    closeAllSensorPorts();
 
     // Blink debug-LED to signal finished bootup
     blinkDebugLED();
@@ -136,8 +138,20 @@ bool RocciBoard::testI2CPort(bool with_debug)
     }
     if(digitalRead(RB_I2C_SDA) == 0)
     {
-        if(with_debug) Serial.print("SDA Fehler");
-        result = false;
+        //clock i2c out
+        Serial.println("try clocking out!!!");
+        pinMode(RB_I2C_SCL, OUTPUT);
+        for(int i = 0; i < 10; i++){
+            digitalWrite(RB_I2C_SCL, HIGH);
+            delayMicroseconds(10);
+            digitalWrite(RB_I2C_SCL, LOW);
+            delayMicroseconds(10);
+        }
+        if(digitalRead(RB_I2C_SDA) == 0)
+        {
+            if(with_debug) Serial.print("SDA Fehler");
+            result = false;
+        }
     } 
     pinMode(RB_I2C_SCL, OUTPUT);
     pinMode(RB_I2C_SDA, INPUT);
