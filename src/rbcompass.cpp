@@ -4,7 +4,7 @@
 
 #include "rbcompass.h"
 
-#define ADDRESS_DEFAULT 0b0101001
+#define ADDRESS_DEFAULT 0x29
 
 RBCompass::RBCompass (int8_t sensor_port) : RBSensor(sensor_port, ADDRESS_DEFAULT)
 {

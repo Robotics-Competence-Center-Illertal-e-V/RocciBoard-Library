@@ -4,7 +4,7 @@
 
 #include "rblaser.h"
 
-#define ADDRESS_DEFAULT 0b0101001 // same for VL53L0X and VL53L1X 
+#define ADDRESS_DEFAULT 0x29 // same for VL53L0X and VL53L1X 
 
 RBLaser::RBLaser (int8_t sensor_port, bool is_long_range) : RBSensor(sensor_port, ADDRESS_DEFAULT)
 {
