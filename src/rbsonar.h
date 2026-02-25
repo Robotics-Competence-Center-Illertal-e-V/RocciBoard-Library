@@ -36,6 +36,7 @@ class RBSonar : public RBSensor
          * Initializes the SRF08 sensor
         */    
         virtual bool init(void);
+        virtual bool isConnected(void);
 
         /**
          * Reads the current distance that the sonar-sensor. Note that this blocks for ca. 100 ms. 

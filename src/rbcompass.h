@@ -36,6 +36,7 @@ class RBCompass : public RBSensor {
         */    
         virtual bool init(void);
 
+        virtual bool isConnected(void);
         /**
          * heading describes the angle of the robot in the horizontal plane 
          * @return int16_t : Heading angle (0° -> 365°)

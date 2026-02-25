@@ -5,20 +5,22 @@
 #include "rblaser.h"
 
 #define ADDRESS_DEFAULT 0x29 // same for VL53L0X and VL53L1X 
+#define ID_REGISTER 0xc0
+#define ID_REGISTER_VALUE 0x0
 
-RBLaser::RBLaser (int8_t sensor_port, bool is_long_range) : RBSensor(sensor_port, ADDRESS_DEFAULT)
+RBLaser::RBLaser (int8_t sensor_port, bool is_long_range) : RBSensor(sensor_port)
 {
     long_range_ = is_long_range;
 }
 
-RBLaser::RBLaser (TwoWire &i2c_wire, bool is_long_range) : RBSensor(i2c_wire, ADDRESS_DEFAULT)
+RBLaser::RBLaser (TwoWire &i2c_wire, bool is_long_range) : RBSensor(i2c_wire)
 {
     long_range_ = is_long_range;
 }
 
 bool RBLaser::init(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     if (long_range_)
     {
         l1x_.setBus(wire_);
@@ -35,15 +37,20 @@ bool RBLaser::init(void)
         l0x_.startContinuous(33);
         l0x_.setMeasurementTimingBudget(33000);
     }
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
+    return true;
+}
+
+bool RBLaser::isConnected(void)
+{
     return true;
 }
 
 uint16_t RBLaser::getDistanceMillimeters(bool blocking)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     uint16_t measurement = long_range_ ? l1x_.readRangeContinuousMillimeters(blocking) : l0x_.readRangeContinuousMillimeters();
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return measurement;
 }
 

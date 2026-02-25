@@ -28,6 +28,7 @@ class RBColor : public RBSensor
          * Initializes the VL53L0X and VL53L1X compass sensor
         */    
         virtual bool init(void);
+        virtual bool isConnected(void);
 
         /**
          * Reads the current reflectance-value of the color red

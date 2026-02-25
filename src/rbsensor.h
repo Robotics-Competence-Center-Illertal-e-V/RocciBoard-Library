@@ -12,7 +12,7 @@
 
 #include "Arduino.h"
 #include "Wire.h"
-#include "TCA9548A.h"
+#include "RBMultiplexer.h"
 
 #define RB_NO_MULTIPLEXER -2
 
@@ -30,13 +30,15 @@ class RBSensor
         */ 
         virtual bool init(void) = 0;
 
+
+        
+        virtual bool isConnected(void) = 0;
         /**
          * Creates the RBSensor-Object for a Multiplexer setup.
          * @param sensor_port port of the sensor
          */
-        RBSensor(int8_t sensor_port, uint8_t sensor_i2c_address)
+        RBSensor(int8_t sensor_port)
         {
-            sensor_i2c_address_ = sensor_i2c_address;
             sensor_port_ = sensor_port;
             wire_ = &Wire;
         }
@@ -51,18 +53,6 @@ class RBSensor
             wire_ = &i2c_wire;
         }
 
-        bool isConnected()
-        {
-            if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
-            wire_.beginTransmission(sensor_i2c_address_);
-            int error = wire_.endTransmission();
-            if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
-
-            if(error == 0)
-                return true;
-            else
-                return false;
-        }
 
         /**
          * Returns the current I²C-port of the sensor.
@@ -83,29 +73,39 @@ class RBSensor
         }
 
         /**
-         * Sets the TCA9548A-I²C-Multiplexer of the sensor.
+         * Sets the RBMultiplexer-I²C-Multiplexer of the sensor.
          * @param tca pointer to new multiplexer of the sensor
          */
-        void setMultiplexer(TCA9548A* tca_mux)
+        void setMultiplexer(RBMultiplexer* tca_mux)
         {
             tca_ = tca_mux;
         }
 
         /**
-         * Returns the TCA9548A-I²C-Multiplexer of the sensor.
-         * @return TCA9548A: pointer to the multiplexer
+         * Returns the RBMultiplexer-I²C-Multiplexer of the sensor.
+         * @return RBMultiplexer: pointer to the multiplexer
          */
-        TCA9548A* getMultiplexer(void)
+        RBMultiplexer* getMultiplexer(void)
         {
             return tca_;
         }
-
+        
     protected:
         int8_t sensor_port_;
-        uint8_t sensor_i2c_address_;
-        TCA9548A* tca_;
+        RBMultiplexer* tca_;
         TwoWire* wire_;
 
+        void startUsing(void)
+        {
+            if(sensor_port_ != RB_NO_MULTIPLEXER) 
+                tca_->openChannel(sensor_port_);
+        }
+
+        void stopUsing(void)
+        {
+            if(sensor_port_ != RB_NO_MULTIPLEXER) 
+                tca_->closeChannel(sensor_port_);
+        }
 };
 
 #endif
