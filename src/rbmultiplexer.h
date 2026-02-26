@@ -64,11 +64,6 @@ class RBMultiplexer {
     void closeAll();
 
     /**
-     * @brief Checks if the multiplexer responds via I2C.
-     */
-    bool verifyPortStatus();
-
-    /**
      * @brief Activates exactly one channel and disables all others.
      */
     void clockOutI2C();

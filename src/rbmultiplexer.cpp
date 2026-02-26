@@ -59,15 +59,14 @@ bool RBMultiplexer::portCycleTest()
         openChannel(sensor_port); 
         if( ! testI2CPort() )
         {
-            Serial.println("try clocking Out...");
-            Serial.flush();
+            Serial.println(" an Port "+String(sensor_port));
+            Serial.println("Toggel SCL um ihn frei zu bekommen ...");
             clockOutI2C();
             if( ! testI2CPort() )
             {
-                Serial.println(" am I2C Port "+String(sensor_port)+". Kabel oder Sensor defekt?");
+                Serial.println(" an Port "+String(sensor_port)+". Kabel oder Sensor defekt?");
                 current_port_status_[sensor_port] = PORT_STATUS_DEFEKT;
-                Serial.println("versuche Multiplexer Reset");
-                Serial.flush();
+                Serial.println("versuche Multiplexer Reset ...");
                 resetMultiplexer(); // reset instead of close to avoid stuck at
                 if( ! testI2CPort() )
                 {
@@ -75,12 +74,12 @@ bool RBMultiplexer::portCycleTest()
                 }
                 else
                 {
-                    Serial.println("Port "+String(sensor_port)+" als Defekt vermerkt");
+                    Serial.println("... Port "+String(sensor_port)+" als defekt vermerkt.");
                 }
             }
             else
             {
-                Serial.println("gelöst");
+                Serial.println("... gelöst");
             }
         }
             
@@ -103,13 +102,13 @@ bool RBMultiplexer::testI2CPort()
     //test scl stuck at gnd
     if(digitalRead(RB_I2C_SCL) == 0) 
     {
-        Serial.println("SCL Low Fehler");
+        Serial.print("SCL Low Fehler ");
         result = false;
     }
     //test sda stuck at gnd
     if(digitalRead(RB_I2C_SDA) == 0)
     {
-        Serial.println("SDA Low Fehler");
+        Serial.print("SDA Low Fehler ");
         result = false;
     } 
     //teste scl and sda short
@@ -118,7 +117,7 @@ bool RBMultiplexer::testI2CPort()
     delayMicroseconds(1);
     if(digitalRead(RB_I2C_SDA) == 0)
     {
-        Serial.println("Kurzschluss zwischen SDA und SCL");
+        Serial.print("SDA, SCL verbunden Fehler ");
         result = false;
     }
     digitalWrite(RB_I2C_SCL, HIGH);
@@ -181,17 +180,6 @@ void RBMultiplexer::clockOutI2C()
     
     Wire.begin();
 }
-
-
-/**
- * @brief Verify device presence on I2C bus
- */
-bool RBMultiplexer::verifyPortStatus()
-{
-    #warning Hier fehlt noch was
-    return true;
-}
-
 
 /**
  * @brief Hardware reset using reset pin

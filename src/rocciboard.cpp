@@ -56,7 +56,7 @@ void RocciBoard::init (void)
     // test i2c port
     if( tca_.testI2CPort() == false)
     {
-        Serial.println(" am Rocciboard I2C. Pin D21 oder D22 belegt?");
+        Serial.println("am Rocciboard I2C. Pin D21 oder D22 belegt?");
         while(1)
         {
             blinkDebugLED();
@@ -79,6 +79,7 @@ void RocciBoard::init (void)
     // test if there is a broken sensor at any of the ports
     if( tca_.portCycleTest() == false)
     {
+        Serial.println("Port hängt. Multiplexer Defekt!");
         while(1)
         {
             blinkDebugLED();
