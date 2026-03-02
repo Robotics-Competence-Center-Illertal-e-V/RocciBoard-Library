@@ -6,7 +6,7 @@
 
 #define ADDRESS_DEFAULT 0x29
 #define ID_REGISTER 0x12
-#define ID_REGISTER_VALUE 0x0
+#define ID_TCS34725 0x44
 
 RBColor::RBColor (int8_t sensor_port) : RBSensor(sensor_port)
 {
@@ -26,7 +26,27 @@ bool RBColor::init(void)
 
 bool RBColor::isConnected(void)
 {
-    return true;
+    startUsing();
+
+    uint8_t chip_id = 0;
+    wire_->beginTransmission(ADDRESS_DEFAULT);
+    wire_->write(ID_REGISTER);
+    if (wire_->endTransmission() != 0)
+    {
+        stopUsing();
+        return false;
+    }
+
+    if (wire_->requestFrom(ADDRESS_DEFAULT, 1) != 1)
+    {
+        stopUsing();
+        return false;
+    }
+
+    chip_id = wire_->read();
+    stopUsing();
+
+    return chip_id == ID_TCS34725;
 }
 
 void RBColor::getData(void)
