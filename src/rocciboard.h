@@ -30,6 +30,7 @@
 #include "rbcolor.h"
 #include "rbinfrared.h"
 #include "rbsonar.h"
+#include "rbmultiplexer.h"
 
 #define RB_DEBUG_LED 13
 #define RB_BATTERY_ADC A0
@@ -119,8 +120,8 @@ class RocciBoard {
     RBMotor motor[4];
 
   private:
-    TCA9548A tca_;   
-    uint8_t tca_addr;
+    RBMultiplexer tca_;   
+    uint8_t tca_addr_;
 
 };
 

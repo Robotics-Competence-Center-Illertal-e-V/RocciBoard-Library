@@ -5,9 +5,9 @@
 #include "Arduino.h"
 #include "rocciboard.h"
 
-RocciBoard::RocciBoard (uint8_t addr) : tca_(addr)
+RocciBoard::RocciBoard (uint8_t tca_addr) : tca_(Wire, tca_addr, RB_MUX_RESET)
 {
-    tca_addr = addr;
+    tca_addr_ = tca_addr;
     motor[0] = RBMotor(5,6);
     motor[1] = RBMotor(7,8);
     motor[2] = RBMotor(9,10);
@@ -50,35 +50,13 @@ void RocciBoard::init (void)
     motor[1].init();
     motor[2].init();
     motor[3].init();
-    // test i2c port
-    if( ! testI2CPort() )
-    {
-        Serial.println(" am Rocciboard I2C. Pin D21 oder D22 belegt?");
-        while(1)
-        {
-            blinkDebugLED();
-            delay(1000);
-        }
-    }
-    // Initializing I2C-Multiplexer
-    resetMultiplexer(); // reset to make sure nothing is still open
+
     Wire.begin();
 
-    //verify TCA is connected with correct address
-    Wire.beginTransmission(tca_addr);
-    int error = Wire.endTransmission();
-    if(error)
+    // test i2c port
+    if( tca_.testI2CPort() == false)
     {
-        Serial.println("Multiplexer Addresse ist Falsch.");
-        for(int i2c_addr = 112; i2c_addr < 120; i2c_addr++)
-        {            
-            Wire.beginTransmission(i2c_addr);
-            int error = Wire.endTransmission();
-            if (error == 0)
-            {
-                Serial.println("verwende: RocciBoard rb("+String(i2c_addr)+")");
-            }
-        }
+        Serial.println("am Rocciboard I2C. Pin D21 oder D22 belegt?");
         while(1)
         {
             blinkDebugLED();
@@ -86,22 +64,27 @@ void RocciBoard::init (void)
         }
     }
 
-    tca_.begin(Wire);
-
-    //test multiplexer i2c ports
-    for(int sensor_port = 0; sensor_port < 8; sensor_port++)
+    // test tca multiplexer
+    if( tca_.selfTest() == false)
     {
-        openSensorPort(sensor_port); 
-        if( ! testI2CPort() )
+        while(1)
         {
-            Serial.println(" am I2C Port "+String(sensor_port)+". Kabel oder Sensor defekt?");
-            while(1)
-            {
-                blinkDebugLED();
-                delay(1000);
-            }
+            blinkDebugLED();
+            delay(1000);
         }
-        resetMultiplexer(); // reset instead of close to avoid stuck at
+    }
+
+    tca_.begin();
+
+    // test if there is a broken sensor at any of the ports
+    if( tca_.portCycleTest() == false)
+    {
+        Serial.println("Port hängt. Multiplexer Defekt!");
+        while(1)
+        {
+            blinkDebugLED();
+            delay(1000);
+        }
     }
 
     // Blink debug-LED to signal finished bootup
@@ -123,41 +106,17 @@ void RocciBoard::closeAllSensorPorts (void)
     tca_.closeAll();
 }
 
-bool RocciBoard::testI2CPort(bool with_debug)
-{
-    bool result = true;
-    Wire.end();
-    pinMode(RB_I2C_SCL, INPUT);
-    pinMode(RB_I2C_SDA, INPUT);
-    if(digitalRead(RB_I2C_SCL) == 0) 
-    {
-        if(with_debug) Serial.print("SCL Fehler");
-        result = false;
-    }
-    if(digitalRead(RB_I2C_SDA) == 0)
-    {
-        if(with_debug) Serial.print("SDA Fehler");
-        result = false;
-    } 
-    pinMode(RB_I2C_SCL, OUTPUT);
-    pinMode(RB_I2C_SDA, INPUT);
-    Wire.begin();
-    return result;
-}
-
 void RocciBoard::resetMultiplexer (void)
 {
-    pinMode(RB_MUX_RESET, OUTPUT);
-    digitalWrite(RB_MUX_RESET, LOW);
-    delay(1);
-    pinMode(RB_MUX_RESET, INPUT_PULLUP);
-    delay(1);
+    tca_.resetMultiplexer();
 }
 
 void RocciBoard::initRBSensor (RBSensor &sensor)
 {
     sensor.setMultiplexer(&tca_);
     sensor.init();
+    if( ! sensor.isConnected())
+        Serial.println("Fehler: Kein Sensor an Port "+ String(sensor.getSensorPort()));
 }
 
 float RocciBoard::getBatteryVoltage (void)
@@ -201,7 +160,7 @@ void RocciBoard::scanI2C(void)
         {            
             Wire.beginTransmission(i2c_addr);
             int error = Wire.endTransmission();
-            if(i2c_addr == tca_addr) //skip multiplexer
+            if(i2c_addr == tca_addr_) //skip multiplexer
             {
                 continue;
             }
