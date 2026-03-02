@@ -73,7 +73,7 @@ int RBSonar::getDistanceCentimeters(void)
 
 void RBSonar::writeAddress(uint8_t newAddress)
 {
-    if(newAddress < 0x70 && newAddress > 0x7F)
+    if(newAddress < 0x70 || newAddress > 0x7F)
     {
         Serial.println("RBSonar::writeAddress address out of range [0x70,0x7F]");
         return;
@@ -114,13 +114,13 @@ bool RBSonar::resultReady()
 int RBSonar::readResultInCentimeters()
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
-    Wire.beginTransmission(_srf_address);
-    Wire.write(RANGE_REGISTER);
-    Wire.endTransmission();
-    Wire.requestFrom(_srf_address, 2);
-    if (Wire.available() >= 2) {
-        int highByte = Wire.read();
-        int lowByte = Wire.read();
+    wire_->beginTransmission(_srf_address);
+    wire_->write(RANGE_REGISTER);
+    wire_->endTransmission();
+    wire_->requestFrom(_srf_address, 2);
+    if (wire_->available() >= 2) {
+        int highByte = wire_->read();
+        int lowByte = wire_->read();
         if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
         return (highByte << 8) + lowByte;
     }
@@ -130,8 +130,8 @@ int RBSonar::readResultInCentimeters()
 
 void RBSonar::command(uint8_t cmd)
 {
-    Wire.beginTransmission(_srf_address);
-    Wire.write(COMMAND_REGISTER);
-    Wire.write(cmd);
-    Wire.endTransmission();
+    wire_->beginTransmission(_srf_address);
+    wire_->write(COMMAND_REGISTER);
+    wire_->write(cmd);
+    wire_->endTransmission();
 }
