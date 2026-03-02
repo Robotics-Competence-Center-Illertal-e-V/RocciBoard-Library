@@ -78,7 +78,13 @@ bool RBLaser::isConnected(void)
 uint16_t RBLaser::getDistanceMillimeters(bool blocking)
 {
     startUsing();
-    uint16_t measurement = long_range_ ? l1x_.readRangeContinuousMillimeters(blocking) : l0x_.readRangeContinuousMillimeters();
+    uint16_t measurement;
+    if (long_range_) {
+        measurement = l1x_.readRangeContinuousMillimeters(blocking);
+    } else {
+        // VL53L0X API does not support blocking parameter
+        measurement = l0x_.readRangeContinuousMillimeters();
+    }
     stopUsing();
     return measurement;
 }
