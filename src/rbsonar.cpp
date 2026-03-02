@@ -33,6 +33,31 @@ bool RBSonar::init(void)
     return true;
 }
 
+bool RBSonar::isConnected(void)
+{
+    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+
+    wire_->beginTransmission(_srf_address);
+    wire_->write(SOFTWARE_REVISION);
+    if (wire_->endTransmission() != 0)
+    {
+        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        return false;
+    }
+
+    if (wire_->requestFrom(_srf_address, 1) != 1)
+    {
+        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        return false;
+    }
+
+    uint8_t revision = wire_->read();
+    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+
+    // SRF08 returns a non-zero software revision value
+    return revision != 0;
+}
+
 int RBSonar::getDistanceCentimeters(void)
 {
     if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
