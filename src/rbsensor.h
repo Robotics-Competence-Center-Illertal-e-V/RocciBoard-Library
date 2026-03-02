@@ -95,7 +95,7 @@ class RBSensor
         
     protected:
         int8_t sensor_port_;
-        RBMultiplexer* tca_;
+        RBMultiplexer* tca_ = nullptr;
         TwoWire* wire_;
 
         /**
