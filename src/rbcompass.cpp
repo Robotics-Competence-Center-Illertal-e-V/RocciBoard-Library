@@ -4,19 +4,63 @@
 
 #include "rbcompass.h"
 
+RBCompass::RBCompass (int8_t sensor_port) : RBSensor(sensor_port)
+{
+}
+
+RBCompass::RBCompass (TwoWire &i2c_wire) : RBSensor(i2c_wire)
+{
+}
+
 bool RBCompass::init(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     bool success = bno_.begin(); // Muss mit Adafruit I2C-Device gelöst
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return success;
+}
+
+#define ADDRESS_DEFAULT 0x29
+#define ID_REGISTER 0x0
+#define ID_REGISTER_VALUE 0xA6
+
+
+bool RBCompass::isConnected(void)
+{
+    startUsing();
+    wire_->beginTransmission(ADDRESS_DEFAULT);
+    wire_->write(ID_REGISTER);  // set register for read
+    int error = wire_->endTransmission(false);// false to not release the line
+    if(error == 0) //continue
+    {   
+        wire_->requestFrom(ADDRESS_DEFAULT, 1); // request 1 byte from register XY
+        uint8_t read_sensor_id = 0;   
+        wire_->readBytes(&read_sensor_id, 1); 
+        if(read_sensor_id == ID_REGISTER_VALUE)
+            error = 0;
+        else
+        {
+            error = 1;
+            Serial.println("Falscher Sensor an Port "+String(sensor_port_));
+            Serial.println("ID war: "+String(read_sensor_id));
+        }
+    }
+    else
+    {
+        Serial.println("kein ACK bekommen "+String(error));
+    }
+    stopUsing();
+    if(error == 0)
+        return true;
+    else
+        return false;
 }
 
 void RBCompass::getData(Adafruit_BNO055::adafruit_vector_type_t event_type)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     bno_.getEvent(&data_, event_type);
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
 }
 
 int16_t RBCompass::getHeading(void)
@@ -39,9 +83,9 @@ int16_t RBCompass::getRoll(void)
 
 int8_t RBCompass::getTemperatureCelsius(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     int8_t temp = bno_.getTemp();
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return temp;
 }
 

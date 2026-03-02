@@ -29,13 +29,14 @@ typedef struct {
 class RBCompass : public RBSensor {
 
     public:
-        using RBSensor::RBSensor;
-
+        RBCompass (int8_t sensor_port);
+        RBCompass (TwoWire &i2c_wire);
         /**
          * Initializes the BNO055 compass sensor
         */    
         virtual bool init(void);
 
+        virtual bool isConnected(void);
         /**
          * heading describes the angle of the robot in the horizontal plane 
          * @return int16_t : Heading angle (0° -> 365°)
