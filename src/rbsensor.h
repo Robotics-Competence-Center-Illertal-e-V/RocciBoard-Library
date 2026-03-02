@@ -27,11 +27,14 @@ class RBSensor
         /**
          * Initializes the RBSensor.
          * This function is implemented by the sensor-subclasses.
-        */ 
+         */
         virtual bool init(void) = 0;
 
-
-        
+        /**
+         * Checks if the sensor is connected.
+         * This function is implemented by the sensor-subclasses.
+         * @return bool: true if sensor is connected, false otherwise
+         */
         virtual bool isConnected(void) = 0;
         /**
          * Creates the RBSensor-Object for a Multiplexer setup.
@@ -95,15 +98,23 @@ class RBSensor
         RBMultiplexer* tca_;
         TwoWire* wire_;
 
+        /**
+         * Opens the I2C multiplexer channel for this sensor (if using a multiplexer).
+         * Must be called before communicating with the sensor through the multiplexer.
+         */
         void startUsing(void)
         {
-            if(sensor_port_ != RB_NO_MULTIPLEXER) 
+            if(sensor_port_ != RB_NO_MULTIPLEXER)
                 tca_->openChannel(sensor_port_);
         }
 
+        /**
+         * Closes the I2C multiplexer channel for this sensor (if using a multiplexer).
+         * Must be called after communicating with the sensor through the multiplexer.
+         */
         void stopUsing(void)
         {
-            if(sensor_port_ != RB_NO_MULTIPLEXER) 
+            if(sensor_port_ != RB_NO_MULTIPLEXER)
                 tca_->closeChannel(sensor_port_);
         }
 };
