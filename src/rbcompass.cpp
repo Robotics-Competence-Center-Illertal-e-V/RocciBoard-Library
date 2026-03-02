@@ -20,7 +20,7 @@ bool RBCompass::init(void)
     return success;
 }
 
-#define ADDRESS_DEFAULT 0x29
+#define ADDRESS_DEFAULT 0x28
 #define ID_REGISTER 0x0
 #define ID_REGISTER_VALUE 0xA6
 
