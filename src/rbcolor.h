@@ -21,12 +21,14 @@ class RBColor : public RBSensor
 {
 
     public:
-        using RBSensor::RBSensor;
+        RBColor (int8_t sensor_port);
+        RBColor (TwoWire &i2c_wire);
 
         /**
          * Initializes the VL53L0X and VL53L1X compass sensor
         */    
         virtual bool init(void);
+        virtual bool isConnected(void);
 
         /**
          * Reads the current reflectance-value of the color red

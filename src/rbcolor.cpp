@@ -4,19 +4,36 @@
 
 #include "rbcolor.h"
 
+#define ADDRESS_DEFAULT 0x29
+#define ID_REGISTER 0x12
+#define ID_REGISTER_VALUE 0x0
+
+RBColor::RBColor (int8_t sensor_port) : RBSensor(sensor_port)
+{
+}
+
+RBColor::RBColor (TwoWire &i2c_wire) : RBSensor(i2c_wire)
+{
+}
+
 bool RBColor::init(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     bool success = tcs_.begin(TCS34725_ADDRESS , wire_);
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return success;
+}
+
+bool RBColor::isConnected(void)
+{
+    return true;
 }
 
 void RBColor::getData(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     tcs_.getRawData(&red_, &green_, &blue_, &clear_);
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
 }
 
 uint16_t RBColor::getRed(void)
