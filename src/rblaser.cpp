@@ -5,9 +5,11 @@
 #include "rblaser.h"
 
 #define ADDRESS_DEFAULT 0x29 // same for VL53L0X and VL53L1X
-#define ID_REGISTER 0xc0
+#define ID_VL53L0X_REGISTER 0xc0
+#define ID_VL53L1X_REGISTER 0x010F
 #define ID_VL53L0X 0xEE
 #define ID_VL53L1X 0xEA
+
 
 RBLaser::RBLaser (int8_t sensor_port, bool is_long_range) : RBSensor(sensor_port)
 {
@@ -48,7 +50,16 @@ bool RBLaser::isConnected(void)
 
     uint8_t chip_id = 0;
     wire_->beginTransmission(ADDRESS_DEFAULT);
-    wire_->write(ID_REGISTER);
+    if(long_range_)
+    {
+        wire_->write(ID_VL53L1X_REGISTER >> 8);
+        wire_->write(ID_VL53L1X_REGISTER & 0xFF);
+    }
+    else
+    {
+         wire_->write(ID_VL53L0X_REGISTER);
+    }
+    
     if (wire_->endTransmission() != 0)
     {
         stopUsing();
@@ -63,15 +74,31 @@ bool RBLaser::isConnected(void)
 
     chip_id = wire_->read();
     stopUsing();
-
+    
     // Verify chip ID matches the expected sensor type
     if (long_range_)
     {
-        return chip_id == ID_VL53L1X;
+        if(chip_id != ID_VL53L1X)
+        {
+            Serial.println("Laser Chip ID falsch war: "+String(chip_id, HEX));
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     else
     {
-        return chip_id == ID_VL53L0X;
+        if(chip_id != ID_VL53L0X)
+        {
+            Serial.println("Laser Chip ID falsch war: "+String(chip_id, HEX));
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
 
