@@ -14,7 +14,7 @@ RocciBoard::RocciBoard (uint8_t tca_addr) : tca_(Wire, tca_addr, RB_MUX_RESET)
     motor[3] = RBMotor(11,12);
 }
 
-void RocciBoard::init (void)
+bool RocciBoard::init (bool block_on_failure)
 {
     Serial.begin(9600);
     // Initializing Error-LED
@@ -29,10 +29,14 @@ void RocciBoard::init (void)
     if(u_bat < 6.0)
     {
         Serial.println("Batteriespannung "+String(u_bat)+"V. Muss über 6V sein");
+        if (block_on_failure) {
         while(1)
         {
             blinkDebugLED();
             delay(1000);
+            }
+        } else {
+            return false;
         }
     }
     #endif
@@ -57,20 +61,28 @@ void RocciBoard::init (void)
     if( tca_.testI2CPort() == false)
     {
         Serial.println("am Rocciboard I2C. Pin D21 oder D22 belegt?");
+        if (block_on_failure) {
         while(1)
         {
             blinkDebugLED();
             delay(1000);
+            }
+        } else {
+            return false;
         }
     }
 
     // test tca multiplexer
     if( tca_.selfTest() == false)
     {
+        if (block_on_failure) {
         while(1)
         {
             blinkDebugLED();
             delay(1000);
+            }
+        } else {
+            return false;
         }
     }
 
@@ -80,15 +92,20 @@ void RocciBoard::init (void)
     if( tca_.portCycleTest() == false)
     {
         Serial.println("Port hängt. Multiplexer Defekt!");
+        if (block_on_failure) {
         while(1)
         {
             blinkDebugLED();
             delay(1000);
+            }
+        } else {
+            return false;
         }
     }
 
     // Blink debug-LED to signal finished bootup
     blinkDebugLED();
+    return true;
 }
 
 void RocciBoard::openSensorPort (uint8_t sensor_port)

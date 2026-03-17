@@ -53,9 +53,10 @@ class RocciBoard {
 
     /**
      * Initializes the RocciBoard
+     * @param block_on_failure if true, the board will halt on initialization failure
      * @return bool : Initialization successful
     */
-    void init (void);
+    bool init (bool block_on_failure = true);
 
     /**
      * verifies if SCL or SDA is stuck on GND
