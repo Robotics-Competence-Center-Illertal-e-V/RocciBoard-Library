@@ -5,8 +5,9 @@
 #include "rbcolor.h"
 
 #define ADDRESS_DEFAULT 0x29
-#define ID_REGISTER 0x12
-#define ID_TCS34725 0x44
+#define ID_REGISTER 0xB2 //Register 0x12 + Command Bit + Auto-Increment Bit [10100000 | 00010010]
+#define ID_TCS34725 0x44 //TCS34721 and TCS34725
+#define ID_TCS34723 0x4D //TCS34723 and TCS34727
 
 RBColor::RBColor (int8_t sensor_port) : RBSensor(sensor_port)
 {
@@ -31,12 +32,11 @@ bool RBColor::isConnected(void)
     uint8_t chip_id = 0;
     wire_->beginTransmission(ADDRESS_DEFAULT);
     wire_->write(ID_REGISTER);
-    if (wire_->endTransmission() != 0)
+    if (wire_->endTransmission(false) != 0)
     {
         stopUsing();
         return false;
     }
-
     if (wire_->requestFrom(ADDRESS_DEFAULT, 1) != 1)
     {
         stopUsing();
@@ -44,9 +44,17 @@ bool RBColor::isConnected(void)
     }
 
     chip_id = wire_->read();
-    stopUsing();
-
-    return chip_id == ID_TCS34725;
+    if(chip_id == ID_TCS34725 || chip_id == ID_TCS34723)
+    {
+        stopUsing();
+        return true;
+    }
+    else    
+    {
+        Serial.println("Color Sensor Chip ID falsch war: "+String(chip_id, HEX));
+        stopUsing();
+        return false;
+    }
 }
 
 void RBColor::getData(void)
