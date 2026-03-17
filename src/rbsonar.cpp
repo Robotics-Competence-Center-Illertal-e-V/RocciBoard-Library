@@ -35,24 +35,24 @@ bool RBSonar::init(void)
 
 bool RBSonar::isConnected(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
 
     wire_->beginTransmission(_srf_address);
     wire_->write(SOFTWARE_REVISION);
     if (wire_->endTransmission() != 0)
     {
-        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        stopUsing();
         return false;
     }
 
     if (wire_->requestFrom(_srf_address, 1) != 1)
     {
-        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        stopUsing();
         return false;
     }
 
     uint8_t revision = wire_->read();
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
 
     // SRF08 returns a non-zero software revision value
     return revision != 0;
@@ -60,14 +60,14 @@ bool RBSonar::isConnected(void)
 
 int RBSonar::getDistanceCentimeters(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     startMeasurement();
     while( ! resultReady())
     {
         delay(1);
     }
     int measurement = readResultInCentimeters();
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return measurement;
 }
 
@@ -78,7 +78,7 @@ void RBSonar::writeAddress(uint8_t newAddress)
         Serial.println("RBSonar::writeAddress address out of range [0x70,0x7F]");
         return;
     }
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     command(0xA0);
     delay(60);
     command(0xAA);
@@ -86,34 +86,34 @@ void RBSonar::writeAddress(uint8_t newAddress)
     command(0xA5);
     delay(60);
     command(newAddress << 1);
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
 }
 
 void RBSonar::startMeasurement()
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     command(CENTIMETERS); 
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
 }
 
 bool RBSonar::resultReady()
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     if (readResultInCentimeters() == -1)
     {
-        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        stopUsing();
         return false;
     }
     else
     {
-        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        stopUsing();
         return true;
     }
 }
 
 int RBSonar::readResultInCentimeters()
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     wire_->beginTransmission(_srf_address);
     wire_->write(RANGE_REGISTER);
     wire_->endTransmission();
@@ -121,10 +121,10 @@ int RBSonar::readResultInCentimeters()
     if (wire_->available() >= 2) {
         int highByte = wire_->read();
         int lowByte = wire_->read();
-        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        stopUsing();
         return (highByte << 8) + lowByte;
     }
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return -1;
 }
 
