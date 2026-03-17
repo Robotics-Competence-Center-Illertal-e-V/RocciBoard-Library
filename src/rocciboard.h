@@ -58,10 +58,6 @@ class RocciBoard {
     */
     bool init (bool block_on_failure = true);
 
-    /**
-     * verifies if SCL or SDA is stuck on GND
-     */
-    bool testI2CPort(bool with_debug = true);
 
     /**
      * Opens a sensor-channel on the I²C-Multiplexer. \n 
