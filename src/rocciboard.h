@@ -90,8 +90,9 @@ class RocciBoard {
      * The TCA9548A-object is injected into the sensor.
      * @param sensor pointer to the object of the sensor (e.g. &compass)
      * @param sensor_port I2C-port of the sensor to initialize
+     * @return bool : Initialization successful
     */
-    void initRBSensor (RBSensor &sensor);
+    bool initRBSensor (RBSensor &sensor);
 
     /**
      * Returns the current voltage of the robots battery

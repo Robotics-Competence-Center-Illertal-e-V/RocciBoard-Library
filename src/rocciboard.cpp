@@ -111,12 +111,23 @@ void RocciBoard::resetMultiplexer (void)
     tca_.resetMultiplexer();
 }
 
-void RocciBoard::initRBSensor (RBSensor &sensor)
+bool RocciBoard::initRBSensor (RBSensor &sensor)
 {
     sensor.setMultiplexer(&tca_);
-    sensor.init();
     if( ! sensor.isConnected())
+    {
         Serial.println("Fehler: Kein Sensor an Port "+ String(sensor.getSensorPort()));
+        return false;
+    }
+    if( ! sensor.init())
+    {
+        Serial.println("Fehler: Sensor an Port "+ String(sensor.getSensorPort())+" konnte nicht initialisiert werden.");
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 float RocciBoard::getBatteryVoltage (void)
