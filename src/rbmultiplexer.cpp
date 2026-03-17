@@ -133,6 +133,14 @@ void RBMultiplexer::openChannel(uint8_t id)
 {
     if (id > 7) return;
     if (current_port_status_[id] == PORT_STATUS_DEFEKT) return;
+    for(int i = 0; i < 8; i++)
+    {
+        if(i != id && current_port_status_[i] == PORT_STATUS_OPEN)
+        {
+            Serial.println("Fehler: Port "+String(id)+" kann nicht geöffnet werden, da Port "+String(i)+" offen ist.");
+            return;
+        }
+    }
     tca_.openChannel(id);
     current_port_status_[id] = PORT_STATUS_OPEN;
 }
