@@ -22,7 +22,7 @@ bool RBCompass::init(void)
 
 #define ADDRESS_DEFAULT 0x28
 #define ID_REGISTER 0x0
-#define ID_REGISTER_VALUE 0xA6
+#define ID_REGISTER_VALUE 0xA0
 
 
 bool RBCompass::isConnected(void)
