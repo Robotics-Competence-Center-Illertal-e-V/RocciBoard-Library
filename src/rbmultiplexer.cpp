@@ -115,7 +115,7 @@ bool RBMultiplexer::testI2CPort()
     pinMode(RB_I2C_SCL, OUTPUT);
     digitalWrite(RB_I2C_SCL, LOW);
     delayMicroseconds(1);
-    if(digitalRead(RB_I2C_SDA) == 0)
+    if(digitalRead(RB_I2C_SDA) == 0 && result == true)
     {
         Serial.print("SDA, SCL verbunden Fehler ");
         result = false;
