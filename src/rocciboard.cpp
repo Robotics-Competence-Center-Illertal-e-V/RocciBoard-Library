@@ -16,6 +16,7 @@ RocciBoard::RocciBoard (uint8_t tca_addr) : tca_(Wire, tca_addr, RB_MUX_RESET)
 
 bool RocciBoard::init (bool block_on_failure)
 {
+    is_initialized_ = false;
     block_on_failure_ = block_on_failure;
     Serial.begin(9600);
     // Initializing Error-LED
@@ -71,6 +72,8 @@ bool RocciBoard::init (bool block_on_failure)
 
     tca_.begin();
 
+    is_initialized_ = true;
+
     // test if there is a broken sensor at any of the ports
     if( tca_.portCycleTest(&err) == false)
     {
@@ -85,6 +88,7 @@ bool RocciBoard::init (bool block_on_failure)
 
 bool RocciBoard::init_fast (void)
 {
+    is_initialized_ = false;
     block_on_failure_ = false;
     Serial.begin(9600);
 
@@ -114,31 +118,38 @@ bool RocciBoard::init_fast (void)
     Wire.begin();
     tca_.begin();
 
+    is_initialized_ = true;
+
     return true;
 }
 
 void RocciBoard::openSensorPort (uint8_t sensor_port)
 {
+    if(!ensureInitialized("openSensorPort")) return;
     tca_.openChannel(sensor_port, nullptr);
 }
 
 void RocciBoard::closeSensorPort (uint8_t sensor_port)
 {
+    if(!ensureInitialized("closeSensorPort")) return;
     tca_.closeChannel(sensor_port, nullptr);
 }
 
 void RocciBoard::closeAllSensorPorts (void)
 {
+    if(!ensureInitialized("closeAllSensorPorts")) return;
     tca_.closeAll();
 }
 
 void RocciBoard::resetMultiplexer (void)
 {
+    if(!ensureInitialized("resetMultiplexer")) return;
     tca_.resetMultiplexer();
 }
 
 bool RocciBoard::initRBSensor (RBSensor &sensor, RBError* err)
 {
+    if(!ensureInitialized("initRBSensor")) return false;
     sensor.setMultiplexer(&tca_);
     RBError local_err;
     RBError* used_err = (err != nullptr) ? err : &local_err;
@@ -177,6 +188,7 @@ float RocciBoard::getBatteryVoltage (void)
 
 uint8_t RocciBoard::getBatteryCharge (void)
 {
+    if(!ensureInitialized("getBatteryCharge")) return 0;
     uint8_t soc = -592.465f + 58.333f * getBatteryVoltage();
     soc = max(min(soc, 100), 0);
     return soc;
@@ -184,6 +196,7 @@ uint8_t RocciBoard::getBatteryCharge (void)
 
 void RocciBoard::blinkDebugLED (void)
 {
+    if(!ensureInitialized("blinkDebugLED")) return;
     digitalWrite(RB_DEBUG_LED, HIGH);
     delay(100);
     digitalWrite(RB_DEBUG_LED, LOW);
@@ -191,6 +204,7 @@ void RocciBoard::blinkDebugLED (void)
 
 void RocciBoard::scanSensors(void)
 {
+    if(!ensureInitialized("scanSensors")) return;
     Serial.println("Start Sensor Scan");
     for(uint8_t port = 0; port < 8; port++)
     {
@@ -232,6 +246,7 @@ void RocciBoard::scanSensors(void)
 
 void RocciBoard::scanI2C(void)
 {
+    if(!ensureInitialized("scanI2C")) return;
     Serial.println("Start I2C Scan");
     for(int sensor_port = 0; sensor_port < 8; sensor_port++)
     {
@@ -320,6 +335,10 @@ void RocciBoard::printError(const RBError& err, Print& out)
         case RB_ERR_BATTERY_LOW:
             out.print("Batteriespannung zu niedrig");
             break;
+        case RB_ERR_NOT_INITIALIZED:
+            out.print("RocciBoard nicht initialisiert (init() oder init_fast() fehlt)");
+            block_on_failure_ = true;
+            break;
         default:
             out.print("Unbekannter Fehler");
             break;
@@ -352,10 +371,23 @@ void RocciBoard::printError(const RBError& err, Print& out)
 
     if (block_on_failure_)
     {
+        pinMode(RB_DEBUG_LED, OUTPUT);
         while(1)
         {
-            blinkDebugLED();
+            digitalWrite(RB_DEBUG_LED, HIGH);
+            delay(100);
+            digitalWrite(RB_DEBUG_LED, LOW);
             delay(1000);
         }
     }
+}
+
+bool RocciBoard::ensureInitialized(const char* function_name)
+{
+    if(is_initialized_) return true;
+
+    RBError err;
+    rbSetError(&err, RB_ERR_NOT_INITIALIZED, "RocciBoard", function_name, -1, tca_addr_);
+    printError(err);
+    return false;
 }

@@ -132,10 +132,12 @@ class RocciBoard {
     RBMotor motor[4];
 
   private:
+    bool ensureInitialized(const char* function_name);
     void printError(const RBError& err, Print& out = Serial);
     RBMultiplexer tca_;   
     uint8_t tca_addr_;
     bool block_on_failure_ = true;
+    bool is_initialized_ = false;
 
 };
 
