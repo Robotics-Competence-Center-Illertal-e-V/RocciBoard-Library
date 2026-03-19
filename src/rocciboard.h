@@ -118,6 +118,12 @@ class RocciBoard {
     void blinkDebugLED (void); 
 
     /**
+     * Disables Serial output for RocciBoard error messages.
+     * Error handling and blocking behavior stay active.
+    */
+    void disableErrorPrint (void);
+
+    /**
      * Rough i2c address scan for debugging purposes. \n
      * The function tries to access each possible I2C address and prints the results to the
      */
@@ -138,6 +144,7 @@ class RocciBoard {
     uint8_t tca_addr_;
     bool block_on_failure_ = true;
     bool is_initialized_ = false;
+    bool print_errors_ = true;
 
 };
 

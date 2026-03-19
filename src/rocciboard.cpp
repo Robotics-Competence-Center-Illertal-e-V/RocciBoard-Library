@@ -202,6 +202,11 @@ void RocciBoard::blinkDebugLED (void)
     digitalWrite(RB_DEBUG_LED, LOW);
 }
 
+void RocciBoard::disableErrorPrint (void)
+{
+    print_errors_ = false;
+}
+
 void RocciBoard::scanSensors(void)
 {
     if(!ensureInitialized("scanSensors")) return;
@@ -271,6 +276,10 @@ void RocciBoard::scanI2C(void)
 
 void RocciBoard::printError(const RBError& err, Print& out)
 {
+    if( ! print_errors_)
+    {
+        return;
+    }
     // Error code string (ERR0 … ERRn)
     out.print("[RB] ERR");
     out.print((int)err.code);
