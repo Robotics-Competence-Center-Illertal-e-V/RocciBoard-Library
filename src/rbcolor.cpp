@@ -51,7 +51,6 @@ bool RBColor::isConnected(void)
     }
     else    
     {
-        Serial.println("Color Sensor Chip ID falsch war: "+String(chip_id, HEX));
         stopUsing();
         return false;
     }

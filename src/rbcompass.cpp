@@ -37,17 +37,13 @@ bool RBCompass::isConnected(void)
         uint8_t read_sensor_id = 0;   
         wire_->readBytes(&read_sensor_id, 1); 
         if(read_sensor_id == ID_REGISTER_VALUE)
+        {
             error = 0;
+        }
         else
         {
             error = 1;
-            Serial.println("Falscher Sensor an Port "+String(sensor_port_));
-            Serial.println("ID war: "+String(read_sensor_id));
         }
-    }
-    else
-    {
-        Serial.println("kein ACK bekommen "+String(error));
     }
     stopUsing();
     if(error == 0)

@@ -80,7 +80,6 @@ bool RBLaser::isConnected(void)
     {
         if(chip_id != ID_VL53L1X)
         {
-            Serial.println("Laser Chip ID falsch war: "+String(chip_id, HEX));
             return false;
         }
         else
@@ -92,7 +91,6 @@ bool RBLaser::isConnected(void)
     {
         if(chip_id != ID_VL53L0X)
         {
-            Serial.println("Laser Chip ID falsch war: "+String(chip_id, HEX));
             return false;
         }
         else
