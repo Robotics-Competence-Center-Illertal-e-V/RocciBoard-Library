@@ -16,6 +16,7 @@ RocciBoard::RocciBoard (uint8_t tca_addr) : tca_(Wire, tca_addr, RB_MUX_RESET)
 
 bool RocciBoard::init (bool block_on_failure)
 {
+    block_on_failure_ = block_on_failure;
     Serial.begin(9600);
     // Initializing Error-LED
     pinMode(RB_DEBUG_LED, OUTPUT);
@@ -28,16 +29,10 @@ bool RocciBoard::init (bool block_on_failure)
     float u_bat = getBatteryVoltage();
     if(u_bat < 6.0)
     {
-        Serial.println("Batteriespannung "+String(u_bat)+"V. Muss über 6V sein");
-        if (block_on_failure) {
-        while(1)
-        {
-            blinkDebugLED();
-            delay(1000);
-            }
-        } else {
-            return false;
-        }
+        RBError err;
+        rbSetError(&err, RB_ERR_BATTERY_LOW, "RocciBoard", "init", -1, 0, (int)(u_bat * 100.0f));
+        printError(err);
+        return false;
     }
     #endif
 
@@ -57,50 +52,30 @@ bool RocciBoard::init (bool block_on_failure)
 
     Wire.begin();
 
-    // test i2c port
-    if( tca_.testI2CPort() == false)
+    RBError err;
+
+
+     // test i2c port
+    if( tca_.testI2CPort(&err) == false)
     {
-        Serial.println("am Rocciboard I2C. Pin D21 oder D22 belegt?");
-        if (block_on_failure) {
-        while(1)
-        {
-            blinkDebugLED();
-            delay(1000);
-            }
-        } else {
-            return false;
-        }
+        printError(err);
+        return false;
     }
 
     // test tca multiplexer
-    if( tca_.selfTest() == false)
+    if( tca_.selfTest(&err) == false)
     {
-        if (block_on_failure) {
-        while(1)
-        {
-            blinkDebugLED();
-            delay(1000);
-            }
-        } else {
-            return false;
-        }
+        printError(err);
+        return false;
     }
 
     tca_.begin();
 
     // test if there is a broken sensor at any of the ports
-    if( tca_.portCycleTest() == false)
+    if( tca_.portCycleTest(&err) == false)
     {
-        Serial.println("Port hängt. Multiplexer Defekt!");
-        if (block_on_failure) {
-        while(1)
-        {
-            blinkDebugLED();
-            delay(1000);
-            }
-        } else {
-            return false;
-        }
+        printError(err);
+        return false;
     }
 
     // Blink debug-LED to signal finished bootup
@@ -110,12 +85,12 @@ bool RocciBoard::init (bool block_on_failure)
 
 void RocciBoard::openSensorPort (uint8_t sensor_port)
 {
-    tca_.openChannel(sensor_port);
+    tca_.openChannel(sensor_port, nullptr);
 }
 
 void RocciBoard::closeSensorPort (uint8_t sensor_port)
 {
-    tca_.closeChannel(sensor_port);
+    tca_.closeChannel(sensor_port, nullptr);
 }
 
 void RocciBoard::closeAllSensorPorts (void)
@@ -128,17 +103,19 @@ void RocciBoard::resetMultiplexer (void)
     tca_.resetMultiplexer();
 }
 
-bool RocciBoard::initRBSensor (RBSensor &sensor)
+bool RocciBoard::initRBSensor (RBSensor &sensor, RBError* err)
 {
     sensor.setMultiplexer(&tca_);
-    if( ! sensor.isConnected())
+    RBError local_err;
+    RBError* used_err = (err != nullptr) ? err : &local_err;
+    if( ! sensor.isConnected(used_err))
     {
-        Serial.println("Fehler: Kein Sensor an Port "+ String(sensor.getSensorPort()));
+        printError(*used_err);
         return false;
     }
-    if( ! sensor.init())
+    if( ! sensor.init(used_err))
     {
-        Serial.println("Fehler: Sensor an Port "+ String(sensor.getSensorPort())+" konnte nicht initialisiert werden.");
+        printError(*used_err);
         return false;
     }
     else
@@ -241,4 +218,110 @@ void RocciBoard::scanI2C(void)
         closeSensorPort(sensor_port);
     }
     Serial.println("Ende");
+}
+
+void RocciBoard::printError(const RBError& err, Print& out)
+{
+    // Error code string (ERR0 … ERRn)
+    out.print("[RB] ERR");
+    out.print((int)err.code);
+    out.print(" - ");
+
+    // Short German description per error code
+    switch(err.code)
+    {
+        case RB_ERR_OK:
+            out.print("Kein Fehler");
+            break;
+        case RB_ERR_I2C_TX_FAILED:
+            out.print("I2C Senden fehlgeschlagen");
+            break;
+        case RB_ERR_I2C_RX_FAILED:
+            out.print("I2C Empfangen fehlgeschlagen");
+            break;
+        case RB_ERR_SENSOR_ID_MISMATCH:
+            out.print("Sensor-ID stimmt nicht ueberein (falscher Sensor oder Typ?)");
+            break;
+        case RB_ERR_MUX_PORT_STUCK_SCL:
+            out.print("SCL-Leitung haengt auf GND");
+            if(err.port == -1)
+            {
+                block_on_failure_ = true;
+            }
+            break;
+        case RB_ERR_MUX_PORT_STUCK_SDA:
+            out.print("SDA-Leitung haengt auf GND");
+            if(err.port == -1)
+            {
+                block_on_failure_ = true;
+            }
+            break;
+        case RB_ERR_MUX_PORT_SHORT_SCL_SDA:
+            out.print("SCL und SDA sind kurzgeschlossen");
+            if(err.port == -1)
+            {
+                block_on_failure_ = true;
+            }
+            break;
+        case RB_ERR_MUX_CHANNEL_CONFLICT:
+            out.print("Multiplexer-Kanal bereits geoeffnet");
+            block_on_failure_ = true;
+            break;
+        case RB_ERR_MUX_INVALID_CHANNEL:
+            out.print("Ungueltige Multiplexer-Kanal-Nummer");
+            break;
+        case RB_ERR_MUX_RESET_FAILED:
+            out.print("Multiplexer-Reset fehlgeschlagen");
+            block_on_failure_ = true;
+            break;
+        case RB_ERR_INIT_FAILED:
+            out.print("Sensor konnte nicht initialisiert werden");
+            break;
+        case RB_ERR_NOT_CONNECTED:
+            out.print("Kein Sensor an diesem Port angeschlossen");
+            break;
+        case RB_ERR_INVALID_ARGUMENT:
+            out.print("Ungueltiges Argument");
+            break;
+        case RB_ERR_BATTERY_LOW:
+            out.print("Batteriespannung zu niedrig");
+            break;
+        default:
+            out.print("Unbekannter Fehler");
+            break;
+    }
+
+    // Context: module, port, address, detail
+    if(err.module)
+    {
+        out.print(" [");
+        out.print(err.module);
+        if(err.function) { out.print("::"); out.print(err.function); }
+        out.print("]");
+    }
+    if(err.port >= 0)
+    {
+        out.print(" Port=");
+        out.print(err.port);
+    }
+    if(err.addr != 0)
+    {
+        out.print(" Addr=0x");
+        out.print(err.addr, HEX);
+    }
+    if(err.detail != 0)
+    {
+        out.print(" Detail=");
+        out.print(err.detail);
+    }
+    out.println();
+
+    if (block_on_failure_)
+    {
+        while(1)
+        {
+            blinkDebugLED();
+            delay(1000);
+        }
+    }
 }

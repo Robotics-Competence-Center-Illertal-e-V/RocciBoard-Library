@@ -89,7 +89,7 @@ class RocciBoard {
      * @param sensor_port I2C-port of the sensor to initialize
      * @return bool : Initialization successful
     */
-    bool initRBSensor (RBSensor &sensor);
+    bool initRBSensor (RBSensor &sensor, RBError* err = nullptr);
 
     /**
      * Returns the current voltage of the robots battery
@@ -125,8 +125,10 @@ class RocciBoard {
     RBMotor motor[4];
 
   private:
+    void printError(const RBError& err, Print& out = Serial);
     RBMultiplexer tca_;   
     uint8_t tca_addr_;
+    bool block_on_failure_ = true;
 
 };
 
