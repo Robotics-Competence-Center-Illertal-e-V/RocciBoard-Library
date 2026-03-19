@@ -111,9 +111,16 @@ class RocciBoard {
     void blinkDebugLED (void); 
 
     /**
-     * Scan the i2c ports for connected devices
+     * Rough i2c address scan for debugging purposes. \n
+     * The function tries to access each possible I2C address and prints the results to the
      */
     void scanI2C(void);
+
+    /**
+     * Scans the sensor ports for connected sensors and prints the results to the serial monitor. \n
+     * The function tries to identify the type of sensor connected to each port and prints the result
+     */
+    void scanSensors(void);
 
     RBMotor motor[4];
 

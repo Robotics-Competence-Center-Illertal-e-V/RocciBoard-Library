@@ -178,6 +178,47 @@ void RocciBoard::blinkDebugLED (void)
     digitalWrite(RB_DEBUG_LED, LOW);
 }
 
+void RocciBoard::scanSensors(void)
+{
+    Serial.println("Start Sensor Scan");
+    for(uint8_t port = 0; port < 8; port++)
+    {
+        for(int addr = 0x70; addr < 0x80; addr++)
+        {
+            RBSonar sonar(port, addr);
+            sonar.setMultiplexer(&tca_);
+            if(sonar.isConnected()) {
+                Serial.println("Port "+String(port)+": Ultraschall (SRF08) mit Adresse "+String(addr, HEX));
+            }
+        }
+
+        RBColor color(port);
+        color.setMultiplexer(&tca_);
+        if(color.isConnected()) {
+            Serial.println("Port "+String(port)+": Farb-Sensor (TCS34725)");
+        }
+
+        RBCompass compass(port);
+        compass.setMultiplexer(&tca_);
+        if(compass.isConnected()) {
+            Serial.println("Port "+String(port)+": Kompass (BNO055)");
+        }
+
+        RBLaser laser_short(port, TYPE_VL53L0X);
+        laser_short.setMultiplexer(&tca_);
+        if(laser_short.isConnected()) {
+            Serial.println("Port "+String(port)+": Laser Short Range (VL53L0X)");
+        }
+
+        RBLaser laser_long(port, TYPE_VL53L1X);
+        laser_long.setMultiplexer(&tca_);
+        if(laser_long.isConnected()) {
+            Serial.println("Port "+String(port)+": Laser Long Range (VL53L1X)");
+        }
+    }
+    Serial.println("Ende");
+}
+
 void RocciBoard::scanI2C(void)
 {
     Serial.println("Start I2C Scan");
