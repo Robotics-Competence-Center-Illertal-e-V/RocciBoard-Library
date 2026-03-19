@@ -21,7 +21,6 @@ void setup()
 {
 
    
-    Serial.begin(9600);     // Establish Serial Connection with the PC
     rb.init();              // Initialize RocciBoard
 
     // Put code here, that only needs to run once: ( e.g. rb.initSensor(&compass); )

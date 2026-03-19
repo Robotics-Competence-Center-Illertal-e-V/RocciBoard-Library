@@ -19,8 +19,6 @@ RocciBoard rb;
 RBLaser laser(0, TYPE_VL53L0X);
 
 void setup() {
-
-    Serial.begin(9600);     // Establish Serial Connection with the PC
     rb.init();              // Initialize RocciBoard
 
     // Initialize laser-sensor on sensor-port 1

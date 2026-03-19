@@ -17,7 +17,6 @@ RocciBoard rb;
 
 void setup() {
 
-    Serial.begin(9600);     // Establish Serial Connection with the PC
     rb.init();              // Initialize RocciBoard
     
 }

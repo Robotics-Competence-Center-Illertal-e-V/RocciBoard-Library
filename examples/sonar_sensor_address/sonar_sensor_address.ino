@@ -21,7 +21,6 @@ RBSonar sonar_neu(0, 0x71);
 RocciBoard rb(0x77); 
 
 void setup() {
-  Serial.begin(9600);
   rb.init();
   rb.initRBSensor(sonar_alt);
   rb.initRBSensor(sonar_neu);
