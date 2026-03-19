@@ -28,12 +28,13 @@ RBSonar::RBSonar (TwoWire &i2c_wire, uint8_t addr) : RBSensor(i2c_wire)
     _srf_address = addr;
 }
 
-bool RBSonar::init(void)
+bool RBSonar::init(RBError* err)
 {
+    (void)err;
     return true;
 }
 
-bool RBSonar::isConnected(void)
+bool RBSonar::isConnected(RBError* err)
 {
     startUsing();
 
@@ -42,12 +43,14 @@ bool RBSonar::isConnected(void)
     if (wire_->endTransmission() != 0)
     {
         stopUsing();
+        rbSetError(err, RB_ERR_I2C_TX_FAILED, "RBSonar", "isConnected", sensor_port_, _srf_address);
         return false;
     }
 
     if (wire_->requestFrom(_srf_address, 1) != 1)
     {
         stopUsing();
+        rbSetError(err, RB_ERR_I2C_RX_FAILED, "RBSonar", "isConnected", sensor_port_, _srf_address);
         return false;
     }
 
@@ -55,7 +58,12 @@ bool RBSonar::isConnected(void)
     stopUsing();
 
     // SRF08 returns a non-zero software revision value
-    return revision != 0;
+    if(revision == 0)
+    {
+        rbSetError(err, RB_ERR_SENSOR_ID_MISMATCH, "RBSonar", "isConnected", sensor_port_, _srf_address, revision);
+        return false;
+    }
+    return true;
 }
 
 int RBSonar::getDistanceCentimeters(void)
@@ -75,7 +83,6 @@ void RBSonar::writeAddress(uint8_t newAddress)
 {
     if(newAddress < 0x70 || newAddress > 0x7F)
     {
-        Serial.println("RBSonar::writeAddress address out of range [0x70,0x7F]");
         return;
     }
     startUsing();

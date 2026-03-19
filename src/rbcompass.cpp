@@ -4,6 +4,10 @@
 
 #include "rbcompass.h"
 
+#define ADDRESS_DEFAULT 0x28
+#define ID_REGISTER 0x0
+#define ID_REGISTER_VALUE 0xA0
+
 RBCompass::RBCompass (int8_t sensor_port) : RBSensor(sensor_port)
 {
 }
@@ -12,20 +16,19 @@ RBCompass::RBCompass (TwoWire &i2c_wire) : RBSensor(i2c_wire)
 {
 }
 
-bool RBCompass::init(void)
+bool RBCompass::init(RBError* err)
 {
     startUsing();
     bool success = bno_.begin(); // Muss mit Adafruit I2C-Device gelöst
     stopUsing();
+    if(!success)
+    {
+        rbSetError(err, RB_ERR_INIT_FAILED, "RBCompass", "init", sensor_port_, ADDRESS_DEFAULT);
+    }
     return success;
 }
 
-#define ADDRESS_DEFAULT 0x28
-#define ID_REGISTER 0x0
-#define ID_REGISTER_VALUE 0xA0
-
-
-bool RBCompass::isConnected(void)
+bool RBCompass::isConnected(RBError* err)
 {
     startUsing();
     wire_->beginTransmission(ADDRESS_DEFAULT);
@@ -34,6 +37,12 @@ bool RBCompass::isConnected(void)
     if(error == 0) //continue
     {   
         wire_->requestFrom(ADDRESS_DEFAULT, 1); // request 1 byte from register XY
+        if(wire_->available() < 1)
+        {
+            stopUsing();
+            rbSetError(err, RB_ERR_I2C_RX_FAILED, "RBCompass", "isConnected", sensor_port_, ADDRESS_DEFAULT);
+            return false;
+        }
         uint8_t read_sensor_id = 0;   
         wire_->readBytes(&read_sensor_id, 1); 
         if(read_sensor_id == ID_REGISTER_VALUE)
@@ -45,11 +54,18 @@ bool RBCompass::isConnected(void)
             error = 1;
         }
     }
+    else
+    {
+        rbSetError(err, RB_ERR_I2C_TX_FAILED, "RBCompass", "isConnected", sensor_port_, ADDRESS_DEFAULT, error);
+    }
     stopUsing();
     if(error == 0)
         return true;
     else
+    {
+        rbSetError(err, RB_ERR_SENSOR_ID_MISMATCH, "RBCompass", "isConnected", sensor_port_, ADDRESS_DEFAULT);
         return false;
+    }
 }
 
 void RBCompass::getData(Adafruit_BNO055::adafruit_vector_type_t event_type)

@@ -17,15 +17,19 @@ RBColor::RBColor (TwoWire &i2c_wire) : RBSensor(i2c_wire)
 {
 }
 
-bool RBColor::init(void)
+bool RBColor::init(RBError* err)
 {
     startUsing();
     bool success = tcs_.begin(TCS34725_ADDRESS , wire_);
     stopUsing();
+    if(!success)
+    {
+        rbSetError(err, RB_ERR_INIT_FAILED, "RBColor", "init", sensor_port_, ADDRESS_DEFAULT);
+    }
     return success;
 }
 
-bool RBColor::isConnected(void)
+bool RBColor::isConnected(RBError* err)
 {
     startUsing();
 
@@ -35,11 +39,13 @@ bool RBColor::isConnected(void)
     if (wire_->endTransmission(false) != 0)
     {
         stopUsing();
+        rbSetError(err, RB_ERR_I2C_TX_FAILED, "RBColor", "isConnected", sensor_port_, ADDRESS_DEFAULT);
         return false;
     }
     if (wire_->requestFrom(ADDRESS_DEFAULT, 1) != 1)
     {
         stopUsing();
+        rbSetError(err, RB_ERR_I2C_RX_FAILED, "RBColor", "isConnected", sensor_port_, ADDRESS_DEFAULT);
         return false;
     }
 
@@ -52,6 +58,7 @@ bool RBColor::isConnected(void)
     else    
     {
         stopUsing();
+        rbSetError(err, RB_ERR_SENSOR_ID_MISMATCH, "RBColor", "isConnected", sensor_port_, ADDRESS_DEFAULT, chip_id);
         return false;
     }
 }

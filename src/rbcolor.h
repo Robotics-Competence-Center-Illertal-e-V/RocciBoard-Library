@@ -36,13 +36,13 @@ class RBColor : public RBSensor
         /**
          * Initializes the TCS34725 color sensor
          */
-        virtual bool init(void);
+        virtual bool init(RBError* err = nullptr);
 
         /**
          * Checks if the color sensor is connected by verifying the chip ID
          * @return bool: true if sensor is connected and responds with correct chip ID
          */
-        virtual bool isConnected(void);
+        virtual bool isConnected(RBError* err = nullptr);
 
         /**
          * Reads the current reflectance-value of the color red

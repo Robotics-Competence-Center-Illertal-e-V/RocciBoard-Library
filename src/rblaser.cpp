@@ -21,13 +21,18 @@ RBLaser::RBLaser (TwoWire &i2c_wire, bool is_long_range) : RBSensor(i2c_wire)
     long_range_ = is_long_range;
 }
 
-bool RBLaser::init(void)
+bool RBLaser::init(RBError* err)
 {
     startUsing();
     if (long_range_)
     {
         l1x_.setBus(wire_);
-        if(!l1x_.init()) return false;
+        if(!l1x_.init())
+        {
+            stopUsing();
+            rbSetError(err, RB_ERR_INIT_FAILED, "RBLaser", "init", sensor_port_, ADDRESS_DEFAULT, TYPE_VL53L1X);
+            return false;
+        }
         l1x_.setTimeout(500);
         l1x_.startContinuous(33);
         l1x_.setMeasurementTimingBudget(33000);
@@ -35,7 +40,12 @@ bool RBLaser::init(void)
     else
     {
         l0x_.setBus(wire_);
-        if(!l0x_.init()) return false;
+        if(!l0x_.init())
+        {
+            stopUsing();
+            rbSetError(err, RB_ERR_INIT_FAILED, "RBLaser", "init", sensor_port_, ADDRESS_DEFAULT, TYPE_VL53L0X);
+            return false;
+        }
         l0x_.setTimeout(500);
         l0x_.startContinuous(33);
         l0x_.setMeasurementTimingBudget(33000);
@@ -44,7 +54,7 @@ bool RBLaser::init(void)
     return true;
 }
 
-bool RBLaser::isConnected(void)
+bool RBLaser::isConnected(RBError* err)
 {
     startUsing();
 
@@ -63,12 +73,14 @@ bool RBLaser::isConnected(void)
     if (wire_->endTransmission() != 0)
     {
         stopUsing();
+        rbSetError(err, RB_ERR_I2C_TX_FAILED, "RBLaser", "isConnected", sensor_port_, ADDRESS_DEFAULT);
         return false;
     }
 
     if (wire_->requestFrom(ADDRESS_DEFAULT, 1) != 1)
     {
         stopUsing();
+        rbSetError(err, RB_ERR_I2C_RX_FAILED, "RBLaser", "isConnected", sensor_port_, ADDRESS_DEFAULT);
         return false;
     }
 
@@ -80,6 +92,7 @@ bool RBLaser::isConnected(void)
     {
         if(chip_id != ID_VL53L1X)
         {
+            rbSetError(err, RB_ERR_SENSOR_ID_MISMATCH, "RBLaser", "isConnected", sensor_port_, ADDRESS_DEFAULT, chip_id);
             return false;
         }
         else
@@ -91,6 +104,7 @@ bool RBLaser::isConnected(void)
     {
         if(chip_id != ID_VL53L0X)
         {
+            rbSetError(err, RB_ERR_SENSOR_ID_MISMATCH, "RBLaser", "isConnected", sensor_port_, ADDRESS_DEFAULT, chip_id);
             return false;
         }
         else

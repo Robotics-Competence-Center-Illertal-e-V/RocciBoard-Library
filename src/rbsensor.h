@@ -13,6 +13,7 @@
 #include "Arduino.h"
 #include "Wire.h"
 #include "RBMultiplexer.h"
+#include "rberror.h"
 
 #define RB_NO_MULTIPLEXER -2
 
@@ -28,14 +29,14 @@ class RBSensor
          * Initializes the RBSensor.
          * This function is implemented by the sensor-subclasses.
          */
-        virtual bool init(void) = 0;
+        virtual bool init(RBError* err = nullptr) = 0;
 
         /**
          * Checks if the sensor is connected.
          * This function is implemented by the sensor-subclasses.
          * @return bool: true if sensor is connected, false otherwise
          */
-        virtual bool isConnected(void) = 0;
+        virtual bool isConnected(RBError* err = nullptr) = 0;
         /**
          * Creates the RBSensor-Object for a Multiplexer setup.
          * @param sensor_port port of the sensor

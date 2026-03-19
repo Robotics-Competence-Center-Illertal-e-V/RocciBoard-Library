@@ -35,13 +35,13 @@ class RBSonar : public RBSensor
         /**
          * Initializes the SRF08 sensor
          */
-        virtual bool init(void);
+        virtual bool init(RBError* err = nullptr);
 
         /**
          * Checks if the sonar sensor is connected by verifying the software revision
          * @return bool: true if sensor is connected and responds with valid revision
          */
-        virtual bool isConnected(void);
+        virtual bool isConnected(RBError* err = nullptr);
 
         /**
          * Reads the current distance that the sonar-sensor measures. Note that this blocks for ca. 100 ms.

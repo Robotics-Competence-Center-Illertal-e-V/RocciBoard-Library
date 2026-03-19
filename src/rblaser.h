@@ -47,13 +47,13 @@ class RBLaser : public RBSensor
         /**
          * Initializes the VL53L0X and VL53L1X laser sensor
          */
-        virtual bool init(void);
+        virtual bool init(RBError* err = nullptr);
 
         /**
          * Checks if the laser sensor is connected by verifying the chip ID
          * @return bool: true if sensor is connected and responds with correct chip ID
          */
-        virtual bool isConnected(void);
+        virtual bool isConnected(RBError* err = nullptr);
 
         /**
          * Reads the current distance that the laser-sensor measures
