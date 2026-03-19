@@ -83,6 +83,40 @@ bool RocciBoard::init (bool block_on_failure)
     return true;
 }
 
+bool RocciBoard::init_fast (void)
+{
+    block_on_failure_ = false;
+    Serial.begin(9600);
+
+    // Initializing Error-LED
+    pinMode(RB_DEBUG_LED, OUTPUT);
+    digitalWrite(RB_DEBUG_LED, LOW);
+
+    // Initializing the voltage-reading ADC
+    pinMode(RB_BATTERY_ADC, INPUT);
+
+    // Changing motor PWM frequency
+    #if defined(__AVR_ATmega2560__)
+        // Arduino Mega: set PWM frequency to 31372.55 Hz
+        TCCR1B = (TCCR1B & B11111000) | B00000001;
+        TCCR2B = (TCCR2B & B11111000) | B00000001;
+        TCCR3B = (TCCR3B & B11111000) | B00000001;
+        TCCR4B = (TCCR4B & B11111000) | B00000001;
+    #endif
+
+    // Initializing Motor Drivers
+    motor[0].init();
+    motor[1].init();
+    motor[2].init();
+    motor[3].init();
+
+    // Initialize I2C and multiplexer without diagnostic tests
+    Wire.begin();
+    tca_.begin();
+
+    return true;
+}
+
 void RocciBoard::openSensorPort (uint8_t sensor_port)
 {
     tca_.openChannel(sensor_port, nullptr);

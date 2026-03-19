@@ -58,6 +58,13 @@ class RocciBoard {
     */
     bool init (bool block_on_failure = true);
 
+    /**
+     * Fast initialization without any startup tests.
+     * Skips battery, I2C and multiplexer port diagnostics.
+     * @return bool : Initialization successful
+    */
+    bool init_fast (void);
+
 
     /**
      * Opens a sensor-channel on the I²C-Multiplexer. \n 
