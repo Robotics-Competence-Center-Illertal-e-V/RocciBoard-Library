@@ -25,66 +25,61 @@ void RBMultiplexer::begin()
     tca_.begin();
 }
 
-bool RBMultiplexer::selfTest()
+bool RBMultiplexer::selfTest(RBError* err)
 {
     //verify TCA is connected with correct address
     Wire.beginTransmission(tca_addr_);
-    int error = Wire.endTransmission();
-    if(error)
+    int tx_error = Wire.endTransmission();
+    if(tx_error)
     {
-        Serial.println("Multiplexer Addresse ist Falsch. Suche Alternative...");
         for(int i2c_addr = 112; i2c_addr < 120; i2c_addr++)
         {            
             Wire.beginTransmission(i2c_addr);
-            int error = Wire.endTransmission();
-            if (error == 0)
+            int probe_error = Wire.endTransmission();
+            if (probe_error == 0)
             {
-                Serial.println("verwende: RocciBoard rb("+String(i2c_addr)+")");
+                rbSetError(err, RB_ERR_I2C_TX_FAILED, "RBMultiplexer", "selfTest", -1, tca_addr_, i2c_addr);
                 return false;
             }
         }
-        Serial.println("RocciBoard Defekt!");
+        rbSetError(err, RB_ERR_I2C_TX_FAILED, "RBMultiplexer", "selfTest", -1, tca_addr_, tx_error);
         return false;
     }
     return true;
 }
 
 
-bool RBMultiplexer::portCycleTest()
+bool RBMultiplexer::portCycleTest(RBError* err)
 {
     closeAll();
     //test multiplexer i2c ports
     for(int sensor_port = 0; sensor_port < 8; sensor_port++)
     {
-        openChannel(sensor_port); 
-        if( ! testI2CPort() )
+        if(!openChannel(sensor_port, err))
         {
-            Serial.println(" an Port "+String(sensor_port));
-            Serial.println("Toggel SCL um ihn frei zu bekommen ...");
+            return false;
+        }
+
+        if( ! testI2CPort(err, sensor_port) )
+        {
             clockOutI2C();
-            if( ! testI2CPort() )
+            if( ! testI2CPort(err, sensor_port) )
             {
-                Serial.println(" an Port "+String(sensor_port)+". Kabel oder Sensor defekt?");
                 current_port_status_[sensor_port] = PORT_STATUS_DEFEKT;
-                Serial.println("versuche Multiplexer Reset ...");
                 resetMultiplexer(); // reset instead of close to avoid stuck at
-                if( ! testI2CPort() )
+                if( ! testI2CPort(err, sensor_port) )
                 {
+                    rbSetError(err, RB_ERR_MUX_RESET_FAILED, "RBMultiplexer", "portCycleTest", sensor_port, tca_addr_);
                     return false;
                 }
                 else
                 {
-                    Serial.println("... Port "+String(sensor_port)+" als defekt vermerkt.");
+                    return false;
                 }
-            }
-            else
-            {
-                Serial.println("... gelöst");
             }
         }
             
-        Serial.flush();
-        closeChannel(sensor_port);
+        closeChannel(sensor_port, nullptr);
     }
 
     closeAll();
@@ -92,32 +87,45 @@ bool RBMultiplexer::portCycleTest()
 }
 
 
-bool RBMultiplexer::testI2CPort()
+bool RBMultiplexer::testI2CPort(RBError* err, int8_t port)
 {
     bool result = true;
     Wire.end();
-    pinMode(RB_I2C_SCL, INPUT);
-    pinMode(RB_I2C_SDA, INPUT);
+    pinMode(RB_I2C_SCL, INPUT_PULLUP);
+    pinMode(RB_I2C_SDA, INPUT_PULLUP);
     delayMicroseconds(5);
+
+    bool scl_low = (digitalRead(RB_I2C_SCL) == 0);
+    bool sda_low = (digitalRead(RB_I2C_SDA) == 0);
+
     //test scl stuck at gnd
-    if(digitalRead(RB_I2C_SCL) == 0) 
+    if(scl_low)
     {
-        Serial.print("SCL Low Fehler ");
         result = false;
     }
     //test sda stuck at gnd
-    if(digitalRead(RB_I2C_SDA) == 0)
+    if(sda_low)
     {
-        Serial.print("SDA Low Fehler ");
         result = false;
-    } 
+    }
+
+    // Prefer reporting SDA low if both are low to avoid masking SDA faults.
+    if(sda_low)
+    {
+        rbSetError(err, RB_ERR_MUX_PORT_STUCK_SDA, "RBMultiplexer", "testI2CPort", port, tca_addr_);
+    }
+    else if(scl_low)
+    {
+        rbSetError(err, RB_ERR_MUX_PORT_STUCK_SCL, "RBMultiplexer", "testI2CPort", port, tca_addr_);
+    }
+
     //teste scl and sda short
     pinMode(RB_I2C_SCL, OUTPUT);
     digitalWrite(RB_I2C_SCL, LOW);
     delayMicroseconds(1);
     if(digitalRead(RB_I2C_SDA) == 0 && result == true)
     {
-        Serial.print("SDA, SCL verbunden Fehler ");
+        rbSetError(err, RB_ERR_MUX_PORT_SHORT_SCL_SDA, "RBMultiplexer", "testI2CPort", port, tca_addr_);
         result = false;
     }
     digitalWrite(RB_I2C_SCL, HIGH);
@@ -129,33 +137,51 @@ bool RBMultiplexer::testI2CPort()
 /**
  * @brief Enable a channel without disabling others
  */
-void RBMultiplexer::openChannel(uint8_t id)
+bool RBMultiplexer::openChannel(uint8_t id, RBError* err)
 {
-    if (id > 7) return;
-    if (current_port_status_[id] == PORT_STATUS_DEFEKT) return;
+    if (id > 7)
+    {
+        rbSetError(err, RB_ERR_MUX_INVALID_CHANNEL, "RBMultiplexer", "openChannel", id, tca_addr_);
+        return false;
+    }
+    if (current_port_status_[id] == PORT_STATUS_DEFEKT)
+    {
+        rbSetError(err, RB_ERR_NOT_CONNECTED, "RBMultiplexer", "openChannel", id, tca_addr_);
+        return false;
+    }
     for(int i = 0; i < 8; i++)
     {
         if(i != id && current_port_status_[i] == PORT_STATUS_OPEN)
         {
-            Serial.println("Fehler: Port "+String(id)+" kann nicht geöffnet werden, da Port "+String(i)+" offen ist.");
-            return;
+            rbSetError(err, RB_ERR_MUX_CHANNEL_CONFLICT, "RBMultiplexer", "openChannel", id, tca_addr_, i);
+            return false;
         }
     }
     tca_.openChannel(id);
     current_port_status_[id] = PORT_STATUS_OPEN;
+    return true;
 }
 
 
 /**
  * @brief Disable a channel
  */
-void RBMultiplexer::closeChannel(uint8_t id)
+bool RBMultiplexer::closeChannel(uint8_t id, RBError* err)
 {
-    if (id > 7) return;
-    if (current_port_status_[id] == PORT_STATUS_DEFEKT) return;
+    if (id > 7)
+    {
+        rbSetError(err, RB_ERR_MUX_INVALID_CHANNEL, "RBMultiplexer", "closeChannel", id, tca_addr_);
+        return false;
+    }
+    if (current_port_status_[id] == PORT_STATUS_DEFEKT)
+    {
+        rbSetError(err, RB_ERR_NOT_CONNECTED, "RBMultiplexer", "closeChannel", id, tca_addr_);
+        return false;
+    }
 
     tca_.closeChannel(id);
     current_port_status_[id] = PORT_STATUS_CLOSED;
+    return true;
 }
 
 /**

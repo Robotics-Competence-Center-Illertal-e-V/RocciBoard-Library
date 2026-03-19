@@ -18,6 +18,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <TCA9548A.h>
+#include "rberror.h"
 
 
 typedef enum {
@@ -43,20 +44,20 @@ class RBMultiplexer {
 
     void begin();
 
-    bool selfTest();
+    bool selfTest(RBError* err = nullptr);
 
-    bool portCycleTest();
+    bool portCycleTest(RBError* err = nullptr);
 
-    bool testI2CPort();
+    bool testI2CPort(RBError* err = nullptr, int8_t port = -1);
     /**
      * @brief Enables a specific channel (0–7).
      */
-    void openChannel(uint8_t id);
+    bool openChannel(uint8_t id, RBError* err = nullptr);
 
     /**
      * @brief Disables a specific channel (0–7).
      */
-    void closeChannel(uint8_t id);
+    bool closeChannel(uint8_t id, RBError* err = nullptr);
     
     /**
      * @brief Disable all channels
