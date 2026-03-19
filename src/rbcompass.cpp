@@ -4,19 +4,75 @@
 
 #include "rbcompass.h"
 
-bool RBCompass::init(void)
+#define ADDRESS_DEFAULT 0x28
+#define ID_REGISTER 0x0
+#define ID_REGISTER_VALUE 0xA0
+
+RBCompass::RBCompass (int8_t sensor_port) : RBSensor(sensor_port)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+}
+
+RBCompass::RBCompass (TwoWire &i2c_wire) : RBSensor(i2c_wire)
+{
+}
+
+bool RBCompass::init(RBError* err)
+{
+    startUsing();
     bool success = bno_.begin(); // Muss mit Adafruit I2C-Device gelöst
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
+    if(!success)
+    {
+        rbSetError(err, RB_ERR_INIT_FAILED, "RBCompass", "init", sensor_port_, ADDRESS_DEFAULT);
+    }
     return success;
+}
+
+bool RBCompass::isConnected(RBError* err)
+{
+    startUsing();
+    wire_->beginTransmission(ADDRESS_DEFAULT);
+    wire_->write(ID_REGISTER);  // set register for read
+    int error = wire_->endTransmission(false);// false to not release the line
+    if(error == 0) //continue
+    {   
+        wire_->requestFrom(ADDRESS_DEFAULT, 1); // request 1 byte from register XY
+        if(wire_->available() < 1)
+        {
+            stopUsing();
+            rbSetError(err, RB_ERR_I2C_RX_FAILED, "RBCompass", "isConnected", sensor_port_, ADDRESS_DEFAULT);
+            return false;
+        }
+        uint8_t read_sensor_id = 0;   
+        wire_->readBytes(&read_sensor_id, 1); 
+        if(read_sensor_id == ID_REGISTER_VALUE)
+        {
+            error = 0;
+        }
+        else
+        {
+            error = 1;
+        }
+    }
+    else
+    {
+        rbSetError(err, RB_ERR_I2C_TX_FAILED, "RBCompass", "isConnected", sensor_port_, ADDRESS_DEFAULT, error);
+    }
+    stopUsing();
+    if(error == 0)
+        return true;
+    else
+    {
+        rbSetError(err, RB_ERR_SENSOR_ID_MISMATCH, "RBCompass", "isConnected", sensor_port_, ADDRESS_DEFAULT);
+        return false;
+    }
 }
 
 void RBCompass::getData(Adafruit_BNO055::adafruit_vector_type_t event_type)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     bno_.getEvent(&data_, event_type);
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
 }
 
 int16_t RBCompass::getHeading(void)
@@ -39,9 +95,9 @@ int16_t RBCompass::getRoll(void)
 
 int8_t RBCompass::getTemperatureCelsius(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     int8_t temp = bno_.getTemp();
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return temp;
 }
 

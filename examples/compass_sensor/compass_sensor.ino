@@ -20,7 +20,6 @@ RBCompass compass(0);
 
 void setup() {
 
-    Serial.begin(9600);     // Establish Serial Connection with the PC
     rb.init();              // Initialize RocciBoard
 
     // Initialize compass-sensor through the RocciBoard

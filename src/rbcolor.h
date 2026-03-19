@@ -1,5 +1,5 @@
 /**
- * @file rblaser.h
+ * @file rbcolor.h
  *
  * Adafruit-TCS34725 Library for use with the RocciBoard
  *
@@ -21,12 +21,28 @@ class RBColor : public RBSensor
 {
 
     public:
-        using RBSensor::RBSensor;
+        /**
+         * Creates the RBColor-object.
+         * @param sensor_port port of the sensor
+         */
+        RBColor (int8_t sensor_port);
 
         /**
-         * Initializes the VL53L0X and VL53L1X compass sensor
-        */    
-        virtual bool init(void);
+         * Creates the RBColor-object.
+         * @param i2c_wire wire-object of the I²C-bus to use
+         */
+        RBColor (TwoWire &i2c_wire);
+
+        /**
+         * Initializes the TCS34725 color sensor
+         */
+        virtual bool init(RBError* err = nullptr);
+
+        /**
+         * Checks if the color sensor is connected by verifying the chip ID
+         * @return bool: true if sensor is connected and responds with correct chip ID
+         */
+        virtual bool isConnected(RBError* err = nullptr);
 
         /**
          * Reads the current reflectance-value of the color red
@@ -60,21 +76,21 @@ class RBColor : public RBSensor
 
         /**
          * Reads the current lux-illuminance value
-         * @return uint16_t: illumniance ("brightness") in lux
+         * @return uint16_t: illuminance ("brightness") in lux
          */
         uint16_t getLux(void);
 
     private:
         /**
-         * Updates the values of the color-sensor
-        */  
-        void getData (void);
+         * Updates the cached color values by reading from the TCS34725 sensor
+         */
+        void getData(void);
 
-        Adafruit_TCS34725 tcs_;
-        uint16_t red_ = 0; 
-        uint16_t green_ = 0; 
-        uint16_t blue_ = 0; 
-        uint16_t clear_ = 0;
+        Adafruit_TCS34725 tcs_;       /**< TCS34725 color sensor instance */
+        uint16_t red_ = 0;            /**< Cached red color value */
+        uint16_t green_ = 0;          /**< Cached green color value */
+        uint16_t blue_ = 0;           /**< Cached blue color value */
+        uint16_t clear_ = 0;          /**< Cached clear/brightness value */
 
 };
 

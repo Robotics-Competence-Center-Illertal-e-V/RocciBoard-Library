@@ -5,17 +5,19 @@
 #include "Arduino.h"
 #include "rocciboard.h"
 
-RocciBoard::RocciBoard (uint8_t addr) : tca_(addr)
+RocciBoard::RocciBoard (uint8_t tca_addr) : tca_(Wire, tca_addr, RB_MUX_RESET)
 {
-    tca_addr = addr;
+    tca_addr_ = tca_addr;
     motor[0] = RBMotor(5,6);
     motor[1] = RBMotor(7,8);
     motor[2] = RBMotor(9,10);
     motor[3] = RBMotor(11,12);
 }
 
-void RocciBoard::init (void)
+bool RocciBoard::init (bool block_on_failure)
 {
+    is_initialized_ = false;
+    block_on_failure_ = block_on_failure;
     Serial.begin(9600);
     // Initializing Error-LED
     pinMode(RB_DEBUG_LED, OUTPUT);
@@ -28,12 +30,10 @@ void RocciBoard::init (void)
     float u_bat = getBatteryVoltage();
     if(u_bat < 6.0)
     {
-        Serial.println("Batteriespannung "+String(u_bat)+"V. Muss über 6V sein");
-        while(1)
-        {
-            blinkDebugLED();
-            delay(1000);
-        }
+        RBError err;
+        rbSetError(&err, RB_ERR_BATTERY_LOW, "RocciBoard", "init", -1, 0, (int)(u_bat * 100.0f));
+        printError(err);
+        return false;
     }
     #endif
 
@@ -50,114 +50,123 @@ void RocciBoard::init (void)
     motor[1].init();
     motor[2].init();
     motor[3].init();
-    // test i2c port
-    if( ! testI2CPort() )
-    {
-        Serial.println(" am Rocciboard I2C. Pin D21 oder D22 belegt?");
-        while(1)
-        {
-            blinkDebugLED();
-            delay(1000);
-        }
-    }
-    // Initializing I2C-Multiplexer
-    resetMultiplexer(); // reset to make sure nothing is still open
+
     Wire.begin();
 
-    //verify TCA is connected with correct address
-    Wire.beginTransmission(tca_addr);
-    int error = Wire.endTransmission();
-    if(error)
+    RBError err;
+
+
+     // test i2c port
+    if( tca_.testI2CPort(&err) == false)
     {
-        Serial.println("Multiplexer Addresse ist Falsch.");
-        for(int i2c_addr = 112; i2c_addr < 120; i2c_addr++)
-        {            
-            Wire.beginTransmission(i2c_addr);
-            int error = Wire.endTransmission();
-            if (error == 0)
-            {
-                Serial.println("verwende: RocciBoard rb("+String(i2c_addr)+")");
-            }
-        }
-        while(1)
-        {
-            blinkDebugLED();
-            delay(1000);
-        }
+        printError(err);
+        return false;
     }
 
-    tca_.begin(Wire);
-
-    //test multiplexer i2c ports
-    for(int sensor_port = 0; sensor_port < 8; sensor_port++)
+    // test tca multiplexer
+    if( tca_.selfTest(&err) == false)
     {
-        openSensorPort(sensor_port); 
-        if( ! testI2CPort() )
-        {
-            Serial.println(" am I2C Port "+String(sensor_port)+". Kabel oder Sensor defekt?");
-            while(1)
-            {
-                blinkDebugLED();
-                delay(1000);
-            }
-        }
-        resetMultiplexer(); // reset instead of close to avoid stuck at
+        printError(err);
+        return false;
+    }
+
+    tca_.begin();
+
+    is_initialized_ = true;
+
+    // test if there is a broken sensor at any of the ports
+    if( tca_.portCycleTest(&err) == false)
+    {
+        printError(err);
+        return false;
     }
 
     // Blink debug-LED to signal finished bootup
     blinkDebugLED();
+    return true;
+}
+
+bool RocciBoard::init_fast (void)
+{
+    is_initialized_ = false;
+    block_on_failure_ = false;
+    Serial.begin(9600);
+
+    // Initializing Error-LED
+    pinMode(RB_DEBUG_LED, OUTPUT);
+    digitalWrite(RB_DEBUG_LED, LOW);
+
+    // Initializing the voltage-reading ADC
+    pinMode(RB_BATTERY_ADC, INPUT);
+
+    // Changing motor PWM frequency
+    #if defined(__AVR_ATmega2560__)
+        // Arduino Mega: set PWM frequency to 31372.55 Hz
+        TCCR1B = (TCCR1B & B11111000) | B00000001;
+        TCCR2B = (TCCR2B & B11111000) | B00000001;
+        TCCR3B = (TCCR3B & B11111000) | B00000001;
+        TCCR4B = (TCCR4B & B11111000) | B00000001;
+    #endif
+
+    // Initializing Motor Drivers
+    motor[0].init();
+    motor[1].init();
+    motor[2].init();
+    motor[3].init();
+
+    // Initialize I2C and multiplexer without diagnostic tests
+    Wire.begin();
+    tca_.begin();
+
+    is_initialized_ = true;
+
+    return true;
 }
 
 void RocciBoard::openSensorPort (uint8_t sensor_port)
 {
-    tca_.openChannel(sensor_port);
+    if(!ensureInitialized("openSensorPort")) return;
+    tca_.openChannel(sensor_port, nullptr);
 }
 
 void RocciBoard::closeSensorPort (uint8_t sensor_port)
 {
-    tca_.closeChannel(sensor_port);
+    if(!ensureInitialized("closeSensorPort")) return;
+    tca_.closeChannel(sensor_port, nullptr);
 }
 
 void RocciBoard::closeAllSensorPorts (void)
 {
+    if(!ensureInitialized("closeAllSensorPorts")) return;
     tca_.closeAll();
-}
-
-bool RocciBoard::testI2CPort(bool with_debug)
-{
-    bool result = true;
-    Wire.end();
-    pinMode(RB_I2C_SCL, INPUT);
-    pinMode(RB_I2C_SDA, INPUT);
-    if(digitalRead(RB_I2C_SCL) == 0) 
-    {
-        if(with_debug) Serial.print("SCL Fehler");
-        result = false;
-    }
-    if(digitalRead(RB_I2C_SDA) == 0)
-    {
-        if(with_debug) Serial.print("SDA Fehler");
-        result = false;
-    } 
-    pinMode(RB_I2C_SCL, OUTPUT);
-    pinMode(RB_I2C_SDA, INPUT);
-    Wire.begin();
-    return result;
 }
 
 void RocciBoard::resetMultiplexer (void)
 {
-    pinMode(RB_MUX_RESET, OUTPUT);
-    digitalWrite(RB_MUX_RESET, LOW);
-    delay(1);
-    pinMode(RB_MUX_RESET, INPUT_PULLUP);
-    delay(1);
+    if(!ensureInitialized("resetMultiplexer")) return;
+    tca_.resetMultiplexer();
 }
 
-void RocciBoard::initRBSensor (RBSensor &sensor)
+bool RocciBoard::initRBSensor (RBSensor &sensor, RBError* err)
 {
+    if(!ensureInitialized("initRBSensor")) return false;
     sensor.setMultiplexer(&tca_);
-    sensor.init();
+    RBError local_err;
+    RBError* used_err = (err != nullptr) ? err : &local_err;
+    if( ! sensor.isConnected(used_err))
+    {
+        printError(*used_err);
+        return false;
+    }
+    if( ! sensor.init(used_err))
+    {
+        printError(*used_err);
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 float RocciBoard::getBatteryVoltage (void)
@@ -179,6 +188,7 @@ float RocciBoard::getBatteryVoltage (void)
 
 uint8_t RocciBoard::getBatteryCharge (void)
 {
+    if(!ensureInitialized("getBatteryCharge")) return 0;
     uint8_t soc = -592.465f + 58.333f * getBatteryVoltage();
     soc = max(min(soc, 100), 0);
     return soc;
@@ -186,13 +196,62 @@ uint8_t RocciBoard::getBatteryCharge (void)
 
 void RocciBoard::blinkDebugLED (void)
 {
+    if(!ensureInitialized("blinkDebugLED")) return;
     digitalWrite(RB_DEBUG_LED, HIGH);
     delay(100);
     digitalWrite(RB_DEBUG_LED, LOW);
 }
 
+void RocciBoard::disableErrorPrint (void)
+{
+    print_errors_ = false;
+}
+
+void RocciBoard::scanSensors(void)
+{
+    if(!ensureInitialized("scanSensors")) return;
+    Serial.println("Start Sensor Scan");
+    for(uint8_t port = 0; port < 8; port++)
+    {
+        for(int addr = 0x70; addr < 0x80; addr++)
+        {
+            RBSonar sonar(port, addr);
+            sonar.setMultiplexer(&tca_);
+            if(sonar.isConnected()) {
+                Serial.println("Port "+String(port)+": Ultraschall (SRF08) mit Adresse "+String(addr, HEX));
+            }
+        }
+
+        RBColor color(port);
+        color.setMultiplexer(&tca_);
+        if(color.isConnected()) {
+            Serial.println("Port "+String(port)+": Farb-Sensor (TCS34725)");
+        }
+
+        RBCompass compass(port);
+        compass.setMultiplexer(&tca_);
+        if(compass.isConnected()) {
+            Serial.println("Port "+String(port)+": Kompass (BNO055)");
+        }
+
+        RBLaser laser_short(port, TYPE_VL53L0X);
+        laser_short.setMultiplexer(&tca_);
+        if(laser_short.isConnected()) {
+            Serial.println("Port "+String(port)+": Laser Short Range (VL53L0X)");
+        }
+
+        RBLaser laser_long(port, TYPE_VL53L1X);
+        laser_long.setMultiplexer(&tca_);
+        if(laser_long.isConnected()) {
+            Serial.println("Port "+String(port)+": Laser Long Range (VL53L1X)");
+        }
+    }
+    Serial.println("Ende");
+}
+
 void RocciBoard::scanI2C(void)
 {
+    if(!ensureInitialized("scanI2C")) return;
     Serial.println("Start I2C Scan");
     for(int sensor_port = 0; sensor_port < 8; sensor_port++)
     {
@@ -201,7 +260,7 @@ void RocciBoard::scanI2C(void)
         {            
             Wire.beginTransmission(i2c_addr);
             int error = Wire.endTransmission();
-            if(i2c_addr == tca_addr) //skip multiplexer
+            if(i2c_addr == tca_addr_) //skip multiplexer
             {
                 continue;
             }
@@ -213,4 +272,131 @@ void RocciBoard::scanI2C(void)
         closeSensorPort(sensor_port);
     }
     Serial.println("Ende");
+}
+
+void RocciBoard::printError(const RBError& err, Print& out)
+{
+    if( ! print_errors_)
+    {
+        return;
+    }
+    // Error code string (ERR0 … ERRn)
+    out.print("[RB] ERR");
+    out.print((int)err.code);
+    out.print(" - ");
+
+    // Short German description per error code
+    switch(err.code)
+    {
+        case RB_ERR_OK:
+            out.print("Kein Fehler");
+            break;
+        case RB_ERR_I2C_TX_FAILED:
+            out.print("I2C Senden fehlgeschlagen");
+            break;
+        case RB_ERR_I2C_RX_FAILED:
+            out.print("I2C Empfangen fehlgeschlagen");
+            break;
+        case RB_ERR_SENSOR_ID_MISMATCH:
+            out.print("Sensor-ID stimmt nicht ueberein (falscher Sensor oder Typ?)");
+            break;
+        case RB_ERR_MUX_PORT_STUCK_SCL:
+            out.print("SCL-Leitung haengt auf GND");
+            if(err.port == -1)
+            {
+                block_on_failure_ = true;
+            }
+            break;
+        case RB_ERR_MUX_PORT_STUCK_SDA:
+            out.print("SDA-Leitung haengt auf GND");
+            if(err.port == -1)
+            {
+                block_on_failure_ = true;
+            }
+            break;
+        case RB_ERR_MUX_PORT_SHORT_SCL_SDA:
+            out.print("SCL und SDA sind kurzgeschlossen");
+            if(err.port == -1)
+            {
+                block_on_failure_ = true;
+            }
+            break;
+        case RB_ERR_MUX_CHANNEL_CONFLICT:
+            out.print("Multiplexer-Kanal bereits geoeffnet");
+            block_on_failure_ = true;
+            break;
+        case RB_ERR_MUX_INVALID_CHANNEL:
+            out.print("Ungueltige Multiplexer-Kanal-Nummer");
+            break;
+        case RB_ERR_MUX_RESET_FAILED:
+            out.print("Multiplexer-Reset fehlgeschlagen");
+            block_on_failure_ = true;
+            break;
+        case RB_ERR_INIT_FAILED:
+            out.print("Sensor konnte nicht initialisiert werden");
+            break;
+        case RB_ERR_NOT_CONNECTED:
+            out.print("Kein Sensor an diesem Port angeschlossen");
+            break;
+        case RB_ERR_INVALID_ARGUMENT:
+            out.print("Ungueltiges Argument");
+            break;
+        case RB_ERR_BATTERY_LOW:
+            out.print("Batteriespannung zu niedrig");
+            break;
+        case RB_ERR_NOT_INITIALIZED:
+            out.print("RocciBoard nicht initialisiert (init() oder init_fast() fehlt)");
+            block_on_failure_ = true;
+            break;
+        default:
+            out.print("Unbekannter Fehler");
+            break;
+    }
+
+    // Context: module, port, address, detail
+    if(err.module)
+    {
+        out.print(" [");
+        out.print(err.module);
+        if(err.function) { out.print("::"); out.print(err.function); }
+        out.print("]");
+    }
+    if(err.port >= 0)
+    {
+        out.print(" Port=");
+        out.print(err.port);
+    }
+    if(err.addr != 0)
+    {
+        out.print(" Addr=0x");
+        out.print(err.addr, HEX);
+    }
+    if(err.detail != 0)
+    {
+        out.print(" Detail=");
+        out.print(err.detail);
+    }
+    out.println();
+
+    if (block_on_failure_)
+    {
+        pinMode(RB_DEBUG_LED, OUTPUT);
+        while(1)
+        {
+            digitalWrite(RB_DEBUG_LED, HIGH);
+            delay(100);
+            digitalWrite(RB_DEBUG_LED, LOW);
+            delay(1000);
+        }
+    }
+}
+
+bool RocciBoard::ensureInitialized(const char* function_name)
+{
+    if(is_initialized_) return true;
+
+    RBError err;
+    rbSetError(&err, RB_ERR_NOT_INITIALIZED, "RocciBoard", function_name, -1, tca_addr_);
+    printError(err);
+    return false;
 }

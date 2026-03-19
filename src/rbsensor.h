@@ -12,7 +12,8 @@
 
 #include "Arduino.h"
 #include "Wire.h"
-#include "TCA9548A.h"
+#include "RBMultiplexer.h"
+#include "rberror.h"
 
 #define RB_NO_MULTIPLEXER -2
 
@@ -27,9 +28,15 @@ class RBSensor
         /**
          * Initializes the RBSensor.
          * This function is implemented by the sensor-subclasses.
-        */ 
-        virtual bool init(void) = 0;
+         */
+        virtual bool init(RBError* err = nullptr) = 0;
 
+        /**
+         * Checks if the sensor is connected.
+         * This function is implemented by the sensor-subclasses.
+         * @return bool: true if sensor is connected, false otherwise
+         */
+        virtual bool isConnected(RBError* err = nullptr) = 0;
         /**
          * Creates the RBSensor-Object for a Multiplexer setup.
          * @param sensor_port port of the sensor
@@ -50,6 +57,7 @@ class RBSensor
             wire_ = &i2c_wire;
         }
 
+
         /**
          * Returns the current I²C-port of the sensor.
          * @return uint8_t: the I²C-mux-port of the sensor
@@ -69,28 +77,47 @@ class RBSensor
         }
 
         /**
-         * Sets the TCA9548A-I²C-Multiplexer of the sensor.
+         * Sets the RBMultiplexer-I²C-Multiplexer of the sensor.
          * @param tca pointer to new multiplexer of the sensor
          */
-        void setMultiplexer(TCA9548A* tca_mux)
+        void setMultiplexer(RBMultiplexer* tca_mux)
         {
             tca_ = tca_mux;
         }
 
         /**
-         * Returns the TCA9548A-I²C-Multiplexer of the sensor.
-         * @return TCA9548A: pointer to the multiplexer
+         * Returns the RBMultiplexer-I²C-Multiplexer of the sensor.
+         * @return RBMultiplexer: pointer to the multiplexer
          */
-        TCA9548A* getMultiplexer(void)
+        RBMultiplexer* getMultiplexer(void)
         {
             return tca_;
         }
-
+        
     protected:
         int8_t sensor_port_;
-        TCA9548A* tca_;
+        RBMultiplexer* tca_ = nullptr;
         TwoWire* wire_;
 
+        /**
+         * Opens the I2C multiplexer channel for this sensor (if using a multiplexer).
+         * Must be called before communicating with the sensor through the multiplexer.
+         */
+        void startUsing(void)
+        {
+            if(sensor_port_ != RB_NO_MULTIPLEXER)
+                tca_->openChannel(sensor_port_);
+        }
+
+        /**
+         * Closes the I2C multiplexer channel for this sensor (if using a multiplexer).
+         * Must be called after communicating with the sensor through the multiplexer.
+         */
+        void stopUsing(void)
+        {
+            if(sensor_port_ != RB_NO_MULTIPLEXER)
+                tca_->closeChannel(sensor_port_);
+        }
 };
 
 #endif

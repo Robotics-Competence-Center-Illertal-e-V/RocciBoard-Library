@@ -30,6 +30,7 @@
 #include "rbcolor.h"
 #include "rbinfrared.h"
 #include "rbsonar.h"
+#include "rbmultiplexer.h"
 
 #define RB_DEBUG_LED 13
 #define RB_BATTERY_ADC A0
@@ -52,14 +53,18 @@ class RocciBoard {
 
     /**
      * Initializes the RocciBoard
+     * @param block_on_failure if true, the board will halt on initialization failure
      * @return bool : Initialization successful
     */
-    void init (void);
+    bool init (bool block_on_failure = true);
 
     /**
-     * verifies if SCL or SDA is stuck on GND
-     */
-    bool testI2CPort(bool with_debug = true);
+     * Fast initialization without any startup tests.
+     * Skips battery, I2C and multiplexer port diagnostics.
+     * @return bool : Initialization successful
+    */
+    bool init_fast (void);
+
 
     /**
      * Opens a sensor-channel on the I²C-Multiplexer. \n 
@@ -89,8 +94,9 @@ class RocciBoard {
      * The TCA9548A-object is injected into the sensor.
      * @param sensor pointer to the object of the sensor (e.g. &compass)
      * @param sensor_port I2C-port of the sensor to initialize
+     * @return bool : Initialization successful
     */
-    void initRBSensor (RBSensor &sensor);
+    bool initRBSensor (RBSensor &sensor, RBError* err = nullptr);
 
     /**
      * Returns the current voltage of the robots battery
@@ -112,15 +118,33 @@ class RocciBoard {
     void blinkDebugLED (void); 
 
     /**
-     * Scan the i2c ports for connected devices
+     * Disables Serial output for RocciBoard error messages.
+     * Error handling and blocking behavior stay active.
+    */
+    void disableErrorPrint (void);
+
+    /**
+     * Rough i2c address scan for debugging purposes. \n
+     * The function tries to access each possible I2C address and prints the results to the
      */
     void scanI2C(void);
+
+    /**
+     * Scans the sensor ports for connected sensors and prints the results to the serial monitor. \n
+     * The function tries to identify the type of sensor connected to each port and prints the result
+     */
+    void scanSensors(void);
 
     RBMotor motor[4];
 
   private:
-    TCA9548A tca_;   
-    uint8_t tca_addr;
+    bool ensureInitialized(const char* function_name);
+    void printError(const RBError& err, Print& out = Serial);
+    RBMultiplexer tca_;   
+    uint8_t tca_addr_;
+    bool block_on_failure_ = true;
+    bool is_initialized_ = false;
+    bool print_errors_ = true;
 
 };
 

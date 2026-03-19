@@ -21,7 +21,6 @@ RBSonar sonar(0);
 
 
 void setup() {
-  Serial.begin(9600);
   rb.init();
   rb.initRBSensor(sonar);
   sonar.startMeasurement(); //starte erste Messung

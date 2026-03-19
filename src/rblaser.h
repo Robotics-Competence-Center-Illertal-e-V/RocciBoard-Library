@@ -1,7 +1,7 @@
 /**
  * @file rblaser.h
  *
- * Polulu VL53L0X/VL53L1X Library for use with the RocciBoard
+ * Pololu VL53L0X/VL53L1X Library for use with the RocciBoard
  *
  * @author Jonas Biener (<jonas.biener@rocci.net>) for the Robotics Competence Center Illertal e. V. (<https://rocci.net>)
  * @version 1.0 [09-2023] First stable release
@@ -45,9 +45,15 @@ class RBLaser : public RBSensor
         RBLaser(TwoWire &i2c_wire, bool is_long_range);
 
         /**
-         * Initializes the VL53L0X and VL53L1X compass sensor
-        */    
-        virtual bool init(void);
+         * Initializes the VL53L0X and VL53L1X laser sensor
+         */
+        virtual bool init(RBError* err = nullptr);
+
+        /**
+         * Checks if the laser sensor is connected by verifying the chip ID
+         * @return bool: true if sensor is connected and responds with correct chip ID
+         */
+        virtual bool isConnected(RBError* err = nullptr);
 
         /**
          * Reads the current distance that the laser-sensor measures
@@ -59,35 +65,35 @@ class RBLaser : public RBSensor
         /**
          * Reads the current distance that the laser-sensor measures
          * @param blocking laser should wait for the next reading
-         * @return uint16_t: distance in centimeters
+         * @return float: distance in centimeters
          */
         float getDistanceCentimeters(bool blocking = true);
 
         /**
          * Reads the current distance that the laser-sensor measures
          * @param blocking laser should wait for the next reading
-         * @return uint16_t: distance in meters
+         * @return float: distance in meters
          */
         float getDistanceMeters(bool blocking = true);
 
         /**
          * Reads the current distance that the laser-sensor measures
          * @param blocking laser should wait for the next reading
-         * @return uint16_t: distance in inches
+         * @return float: distance in inches
          */
         float getDistanceInches(bool blocking = true);
 
         /**
          * Reads the current distance that the laser-sensor measures
          * @param blocking laser should wait for the next reading
-         * @return uint16_t: distance in feet
+         * @return float: distance in feet
          */
         float getDistanceFeet(bool blocking = true);
 
     private:
-        bool long_range_;
-        VL53L0X l0x_;
-        VL53L1X l1x_;
+        bool long_range_;            /**< true for VL53L1X (long-range), false for VL53L0X (short-range) */
+        VL53L0X l0x_;               /**< VL53L0X short-range sensor instance */
+        VL53L1X l1x_;               /**< VL53L1X long-range sensor instance */
 
 };
 

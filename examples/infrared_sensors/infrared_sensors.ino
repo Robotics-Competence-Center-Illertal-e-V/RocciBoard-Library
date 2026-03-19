@@ -17,8 +17,6 @@ RBInfrared infrared(50, 51, 52, 53);
 
 void setup() 
 {
-    Serial.begin(9600);     // Establish Serial Connection with the PC
-
     // Initialize the infrared-sensors
     infrared.init();
 }

@@ -28,32 +28,64 @@ RBSonar::RBSonar (TwoWire &i2c_wire, uint8_t addr) : RBSensor(i2c_wire)
     _srf_address = addr;
 }
 
-bool RBSonar::init(void)
+bool RBSonar::init(RBError* err)
 {
+    (void)err;
+    return true;
+}
+
+bool RBSonar::isConnected(RBError* err)
+{
+    startUsing();
+
+    wire_->beginTransmission(_srf_address);
+    wire_->write(SOFTWARE_REVISION);
+    if (wire_->endTransmission() != 0)
+    {
+        stopUsing();
+        rbSetError(err, RB_ERR_I2C_TX_FAILED, "RBSonar", "isConnected", sensor_port_, _srf_address);
+        return false;
+    }
+
+    if (wire_->requestFrom(_srf_address, 1) != 1)
+    {
+        stopUsing();
+        rbSetError(err, RB_ERR_I2C_RX_FAILED, "RBSonar", "isConnected", sensor_port_, _srf_address);
+        return false;
+    }
+
+    uint8_t revision = wire_->read();
+    stopUsing();
+
+    // SRF08 returns a non-zero software revision value
+    if(revision == 0)
+    {
+        rbSetError(err, RB_ERR_SENSOR_ID_MISMATCH, "RBSonar", "isConnected", sensor_port_, _srf_address, revision);
+        return false;
+    }
     return true;
 }
 
 int RBSonar::getDistanceCentimeters(void)
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     startMeasurement();
     while( ! resultReady())
     {
         delay(1);
     }
     int measurement = readResultInCentimeters();
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return measurement;
 }
 
 void RBSonar::writeAddress(uint8_t newAddress)
 {
-    if(newAddress < 0x70 && newAddress > 0x7F)
+    if(newAddress < 0x70 || newAddress > 0x7F)
     {
-        Serial.println("RBSonar::writeAddress address out of range [0x70,0x7F]");
         return;
     }
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     command(0xA0);
     delay(60);
     command(0xAA);
@@ -61,52 +93,52 @@ void RBSonar::writeAddress(uint8_t newAddress)
     command(0xA5);
     delay(60);
     command(newAddress << 1);
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
 }
 
 void RBSonar::startMeasurement()
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     command(CENTIMETERS); 
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
 }
 
 bool RBSonar::resultReady()
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
+    startUsing();
     if (readResultInCentimeters() == -1)
     {
-        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        stopUsing();
         return false;
     }
     else
     {
-        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+        stopUsing();
         return true;
     }
 }
 
 int RBSonar::readResultInCentimeters()
 {
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->openChannel(sensor_port_);
-    Wire.beginTransmission(_srf_address);
-    Wire.write(RANGE_REGISTER);
-    Wire.endTransmission();
-    Wire.requestFrom(_srf_address, 2);
-    if (Wire.available() >= 2) {
-        int highByte = Wire.read();
-        int lowByte = Wire.read();
-        if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    startUsing();
+    wire_->beginTransmission(_srf_address);
+    wire_->write(RANGE_REGISTER);
+    wire_->endTransmission();
+    wire_->requestFrom(_srf_address, 2);
+    if (wire_->available() >= 2) {
+        int highByte = wire_->read();
+        int lowByte = wire_->read();
+        stopUsing();
         return (highByte << 8) + lowByte;
     }
-    if(sensor_port_ != RB_NO_MULTIPLEXER) tca_->closeChannel(sensor_port_);
+    stopUsing();
     return -1;
 }
 
 void RBSonar::command(uint8_t cmd)
 {
-    Wire.beginTransmission(_srf_address);
-    Wire.write(COMMAND_REGISTER);
-    Wire.write(cmd);
-    Wire.endTransmission();
+    wire_->beginTransmission(_srf_address);
+    wire_->write(COMMAND_REGISTER);
+    wire_->write(cmd);
+    wire_->endTransmission();
 }
